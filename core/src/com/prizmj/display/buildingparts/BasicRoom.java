@@ -19,7 +19,7 @@ public class BasicRoom extends Room {
      * @param height - The height of the room. (approx.)
      * @param floorColor - The color the floor of the room.
      */
-    public BasicRoom(String name, float x, float y, int width, int height, Color floorColor) {
-        super(name, x, y, width, height, floorColor);
+    public BasicRoom(String name, float x, float y, float z, int width, int height, Color floorColor) {
+        super(name, x, y, z, width, height, floorColor);
     }
 }

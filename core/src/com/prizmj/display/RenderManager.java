@@ -24,18 +24,46 @@ public class RenderManager {
         this.models = new Array<>();
     }
 
-    public void createBasicRoom(String name, float x, float y, int width, int height, Color floorColor, int dimension) {
-        BasicRoom basicRoom = new BasicRoom(name, x, y, width, height, floorColor);
+    @Deprecated
+    public void createBasicRoom(String name, float x, float y, float z, int width, int height, Color floorColor, int dimension) {
+        BasicRoom basicRoom = new BasicRoom(name, x, y, z, width, height, floorColor);
         rooms.add(basicRoom);
-        models.add(new RoomModel(basicRoom, prizmJ.getModelBuilder(), dimension));
+        RoomModel roomModel = new RoomModel(basicRoom, prizmJ.getModelBuilder(), dimension);
+        roomModel.setVisibility(roomModel.getDimension() == dimension);
+        models.add(roomModel);
+    }
+
+    public void createBasicRoomPair(String room1name, String room2name, float x, float y, float z, int width, int height, Color floorColor) {
+        BasicRoom room1 = new BasicRoom(room1name, x, y, z, width, height, floorColor);
+        BasicRoom room2 = new BasicRoom(room2name, x, y, z, width, height, floorColor);
+        rooms.addAll(room1, room2);
+        RoomModel roomModel1 = new RoomModel(room1, prizmJ.getModelBuilder(), 2);
+        RoomModel roomModel2 = new RoomModel(room1, prizmJ.getModelBuilder(), 3);
+        roomModel1.setVisibility(roomModel1.getDimension() == prizmJ.getCurrentDimension());
+        roomModel2.setVisibility(roomModel2.getDimension() == prizmJ.getCurrentDimension());
+        models.addAll(roomModel1, roomModel2);
+    }
+
+    public void moveRoomByName(String name) {
+        //todo
+    }
+
+    public void switchDimension(int dimension) {
+        models.forEach(rm -> rm.setVisibility(rm.getDimension() == dimension));
     }
 
     public void render(ModelBatch modelBatch, Environment environment) {
-        models.forEach(rm -> rm.render(modelBatch, environment));
+        models.forEach(rm -> {
+            if(rm.isVisible()) rm.render(modelBatch, environment);
+        });
     }
 
     public Array getRooms() {
         return rooms;
+    }
+
+    public int getNumberofRooms() {
+        return rooms.size / 2;
     }
 
 }

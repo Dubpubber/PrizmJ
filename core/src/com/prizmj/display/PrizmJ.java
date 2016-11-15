@@ -3,22 +3,23 @@ package com.prizmj.display;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 
 public class PrizmJ extends ApplicationAdapter {
 
     private PerspectiveCamera pCamera;
-    private float camSpeed = 0.0f;
+    private float camSpeed = 0.25f;
 
     private ModelBuilder modelBuilder;
     private ModelBatch modelBatch;
@@ -31,9 +32,16 @@ public class PrizmJ extends ApplicationAdapter {
     private BitmapFont font;
     private boolean DEBUG = true;
 
+    public int currentDimension = 3;
+
+    public static final float WALL_HEIGHT = 2.5f;
+    public static final float WALL_THICKNESS = 0.25f;
+    public static final float WALL_OFFSET = 0.139f;
+
     @Override
     public void create() {
         this.modelBatch = new ModelBatch();
+        this.currentDimension = MathUtils.clamp(currentDimension, 2, 3);
 
         pCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pCamera.position.set(10f, 10f, 10f);
@@ -46,10 +54,11 @@ public class PrizmJ extends ApplicationAdapter {
 
         modelBuilder = new ModelBuilder();
         this.manager = new RenderManager(this);
-        manager.createBasicRoom("GrimaceisA FAGGGGG", 0, 0, 5, 5, Color.RED, 2);
-        manager.createBasicRoom("GrimaceisA FAGGGGG (in 3d)", 0, 0, 5, 5, Color.GREEN, 3);
-        manager.createBasicRoom("GrimaceisA FAGGGGG (in 3d)", 0, 0, 5, 7, Color.GOLD, 3);
-        manager.createBasicRoom("GrimaceisA FAGGGGG (in 3d)", 0, 0, 15, 5, Color.MAGENTA, 3);
+        manager.createBasicRoomPair("Room1", "Room2", 0, 0, 0, 10, 10, Color.GRAY);
+        manager.createBasicRoomPair("Room3", "Room4", 10, 0, 0, 10, 10, Color.GOLD);
+        manager.createBasicRoomPair("Room3", "Room4", 10, WALL_HEIGHT, 10, 10, 10, Color.VIOLET);
+        manager.createBasicRoomPair("Room3", "Room4", 10, 0, 10, 10, 10, Color.MAGENTA);
+        manager.switchDimension(currentDimension);
         /*model = modelBuilder.createBox(3f, 2.5f, 1f,
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -78,7 +87,7 @@ public class PrizmJ extends ApplicationAdapter {
             font.draw(batch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), -315, 235);
             font.draw(batch, String.format("CamSpeed: %f", camSpeed), -315, 218);
             font.draw(batch, String.format("Total Memory: %dMB", Runtime.getRuntime().totalMemory() / (1024*1024)), -315, 201);
-            font.draw(batch, String.format("Room Count: %d", manager.getRooms().size), -315, 164);
+            font.draw(batch, String.format("Room Count: %d", manager.getNumberofRooms()), -315, 164);
             batch.end();
             debugCam.update();
         }
@@ -92,11 +101,20 @@ public class PrizmJ extends ApplicationAdapter {
         if(Gdx.input.isKeyPressed(Input.Keys.D))
             pCamera.translate(camSpeed, 0, 0);
         if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
-            camSpeed -= 0.33f;
+            camSpeed -= 0.25f;
         if(Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
-            camSpeed += 0.33f;
+            camSpeed += 0.25f;
         if(Gdx.input.isKeyJustPressed(Input.Keys.F2))
             pCamera.position.set(10f, 10f, 10f);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
+            if (currentDimension == 3) {
+                manager.switchDimension(2);
+                currentDimension = 2;
+            } else {
+                manager.switchDimension(3);
+                currentDimension = 3;
+            }
+        }
         camSpeed = MathUtils.clamp(camSpeed, 0, 5);
         if(Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             DEBUG = !DEBUG;
@@ -123,6 +141,10 @@ public class PrizmJ extends ApplicationAdapter {
 
     public Environment getEnvironment() {
         return environment;
+    }
+
+    public int getCurrentDimension() {
+        return currentDimension;
     }
 
 }
