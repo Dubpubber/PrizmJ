@@ -1,10 +1,12 @@
-package com.prizmj.display.noderelationstructure;
+package com.prizmj.display.geometricnetworkmodel;
 
 import java.util.UUID;
 
 /**
- * Created by BBCommand on 11/14/2016.
+ * Created by GrimmityGrammity on 11/14/2016.
  */
+
+// TODO: Possible inner class?
 public class Edge {
 
     private UUID id;
@@ -17,10 +19,7 @@ public class Edge {
     private float traversalTime;
 
 
-
-    public UUID getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
 
     public void setId(UUID id) {
         this.id = id;

@@ -1,12 +1,14 @@
-package com.prizmj.display.noderelationstructure;
+package com.prizmj.display.geometricnetworkmodel;
 
 import com.prizmj.display.buildingparts.*;
 
 import java.util.UUID;
 
 /**
- * Created by BBCommand on 11/14/2016.
+ * Created by GrimmityGrammity on 11/14/2016.
  */
+
+// TODO: Possible inner class?
 public class Node {
 
     private UUID id;
