@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.buildingparts.Room;
@@ -62,27 +63,29 @@ public class RoomModel {
         // Create the floor of the room.
         BoxShapeBuilder.build(mpb, 0, 0, 0, room.getWidth(), 0.25f, room.getHeight());
         if(room.getHeight() % 2 == 0) {
-            // Wall coming from p1
+            // WALL 1
             BoxShapeBuilder.build(mpb, 0, PrizmJ.WALL_HEIGHT / 2, ((room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET, room.getWidth(), PrizmJ.WALL_HEIGHT, PrizmJ.WALL_THICKNESS);
-            // Wall coming from p4
+            // WALL 2
             BoxShapeBuilder.build(mpb, 0, PrizmJ.WALL_HEIGHT / 2, ((-room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET, room.getWidth(), PrizmJ.WALL_HEIGHT, PrizmJ.WALL_THICKNESS);
         } else {
-            // Wall coming from p1
+            // WALL 1
             BoxShapeBuilder.build(mpb, 0, PrizmJ.WALL_HEIGHT / 2, ((room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET, room.getWidth(), PrizmJ.WALL_HEIGHT, PrizmJ.WALL_THICKNESS);
-            // Wall coming from p4
+            // WALL 2
             BoxShapeBuilder.build(mpb, 0, PrizmJ.WALL_HEIGHT / 2, ((-room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET, room.getWidth(), PrizmJ.WALL_HEIGHT, PrizmJ.WALL_THICKNESS);
         }
         if(room.getWidth() % 2 == 0) {
-            // Wall coming from p2
+            // WALL 3
             BoxShapeBuilder.build(mpb, ((-room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET, PrizmJ.WALL_HEIGHT / 2, 0, PrizmJ.WALL_THICKNESS, PrizmJ.WALL_HEIGHT, room.getHeight());
-            // Wall coming from p3
+            // WALL 4
             BoxShapeBuilder.build(mpb, ((room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET, PrizmJ.WALL_HEIGHT / 2, 0, PrizmJ.WALL_THICKNESS, PrizmJ.WALL_HEIGHT, room.getHeight());
         } else {
-            // Wall coming from p2
+            // WALL 3
             BoxShapeBuilder.build(mpb, ((-room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET, PrizmJ.WALL_HEIGHT / 2, 0, PrizmJ.WALL_THICKNESS, PrizmJ.WALL_HEIGHT, room.getHeight());
-            // Wall coming from p3
+            // WALL 4
             BoxShapeBuilder.build(mpb, ((room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET, PrizmJ.WALL_HEIGHT / 2, 0, PrizmJ.WALL_THICKNESS, PrizmJ.WALL_HEIGHT, room.getHeight());
         }
+        mpb = builder.part("basic_room", GL20.GL_TRIANGLES, VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position, new Material(ColorAttribute.createDiffuse(PrizmJ.DOOR_COLOR)));
+        BoxShapeBuilder.build(mpb, ((room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET, (PrizmJ.WALL_HEIGHT / 2) - PrizmJ.DOOR_HEIGHT / 2, 0, PrizmJ.WALL_THICKNESS + 0.25f, PrizmJ.DOOR_HEIGHT, 0.924f);
         model = builder.end();
         instance = new ModelInstance(model);
         System.out.println(model.nodes.size);
@@ -90,6 +93,27 @@ public class RoomModel {
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
         instance.transform.set(node.globalTransform);
         instance.calculateTransforms();
+    }
+
+    public void createDoor(ModelBuilder builder, int side) {
+        if(side < 1 || side > 4) side = MathUtils.random(1, 4);
+        switch(side) {
+            case 1:
+                // Wall 1
+                break;
+            case 2:
+                // Wall 2
+
+                break;
+            case 3:
+                // Wall 3
+
+                break;
+            case 4:
+                // Wall 4
+
+                break;
+        }
     }
 
     public int getDimension() {

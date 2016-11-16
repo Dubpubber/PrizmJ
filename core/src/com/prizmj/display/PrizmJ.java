@@ -38,6 +38,9 @@ public class PrizmJ extends ApplicationAdapter {
     public static final float WALL_THICKNESS = 0.25f;
     public static final float WALL_OFFSET = 0.139f;
 
+    public static final float DOOR_HEIGHT = 1.25f;
+    public static final Color DOOR_COLOR = Color.RED;
+
     @Override
     public void create() {
         this.modelBatch = new ModelBatch();
@@ -55,9 +58,6 @@ public class PrizmJ extends ApplicationAdapter {
         modelBuilder = new ModelBuilder();
         this.manager = new RenderManager(this);
         manager.createBasicRoomPair("Room1", "Room2", 0, 0, 0, 10, 10, Color.GRAY);
-        manager.createBasicRoomPair("Room3", "Room4", 10, 0, 0, 10, 10, Color.GOLD);
-        manager.createBasicRoomPair("Room3", "Room4", 10, WALL_HEIGHT, 10, 10, 10, Color.VIOLET);
-        manager.createBasicRoomPair("Room3", "Room4", 10, 0, 10, 10, 10, Color.MAGENTA);
         manager.switchDimension(currentDimension);
         /*model = modelBuilder.createBox(3f, 2.5f, 1f,
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
