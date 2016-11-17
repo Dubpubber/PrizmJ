@@ -1,8 +1,8 @@
-package com.prizmj.display;
+package com.prizmj.display.simulation;
 
 import com.badlogic.gdx.graphics.g3d.model.Node;
-import com.prizmj.display.Building;
-import com.prizmj.display.geometricnetworkmodel.Edge;
+import com.prizmj.display.Blueprint;
+import com.prizmj.display.simulation.components.Edge;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -18,7 +18,7 @@ public class GNM {
     private Node[] nodes;
     private Edge[] edges;
 
-    public GNM(Building building) {
+    public GNM(Blueprint blueprint) {
         create();
     }
 

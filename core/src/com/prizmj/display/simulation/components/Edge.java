@@ -1,4 +1,4 @@
-package com.prizmj.display.geometricnetworkmodel;
+package com.prizmj.display.simulation.components;
 
 import java.util.UUID;
 

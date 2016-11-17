@@ -15,6 +15,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
+import com.prizmj.display.models.RoomModel;
+import com.prizmj.display.parts.BasicRoom;
+import com.prizmj.display.parts.Door;
 
 public class PrizmJ extends ApplicationAdapter {
 
@@ -40,6 +43,7 @@ public class PrizmJ extends ApplicationAdapter {
 
     public static final float DOOR_HEIGHT = 1.25f;
     public static final Color DOOR_COLOR = Color.RED;
+    public static final float DOOR_DEPTH = 0.924f;
 
     @Override
     public void create() {
@@ -57,13 +61,17 @@ public class PrizmJ extends ApplicationAdapter {
 
         modelBuilder = new ModelBuilder();
         this.manager = new RenderManager(this);
-        manager.createBasicRoomPair("Room1", "Room2", 0, 0, 0, 10, 10, Color.GRAY);
+        manager.createBasicRoom2D3DPair("Room", 0, 0, 0, 12, 10, Color.GRAY, new Door(3));
+        manager.createBasicRoom2D3DPair("Hallway", 0, 0, 0, 13, 7, Color.GRAY);
+        manager.createBasicRoom2D3DPair("Room2", 0, 0, 0, 29, 29, Color.GRAY);
+        try {
+            // Get this room, and attach this one at this wall
+            manager.attachRoom("Room", "Hallway", Cardinal.NORTH);
+            manager.attachRoom("Room", "Room2", Cardinal.NORTH);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         manager.switchDimension(currentDimension);
-        /*model = modelBuilder.createBox(3f, 2.5f, 1f,
-                new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        instance = new ModelInstance(model);
-        instance.transform.translate(10, 0, 0);*/
         if(DEBUG) {
             debugCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch = new SpriteBatch();

@@ -1,7 +1,6 @@
-package com.prizmj.display.buildingparts;
+package com.prizmj.display.parts;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 
 /**
  * com.prizmj.display.buildingparts.BasicRoom in PrizmJ

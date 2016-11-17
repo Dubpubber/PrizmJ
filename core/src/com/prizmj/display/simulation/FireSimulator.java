@@ -1,4 +1,6 @@
-package com.prizmj.display;
+package com.prizmj.display.simulation;
+
+import com.prizmj.display.Blueprint;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -15,8 +17,8 @@ public class FireSimulator {
 
     private GNM gnm;
 
-    public void generateGNM(Building building) {
-        gnm = new GNM(building);
+    public void generateGNM(Blueprint blueprint) {
+        gnm = new GNM(blueprint);
     }
 
     public GNM getGNM() {

@@ -1,4 +1,4 @@
-package com.prizmj.display.buildingparts;
+package com.prizmj.display.parts;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
@@ -48,6 +48,18 @@ public abstract class Room {
         this.width = width;
         this.height = height;
         this.floorColor = floorColor;
+    }
+
+    public void updatePosition(Vector3 vector3) {
+        this.x = vector3.x;
+        this.y = vector3.y;
+        this.z = vector3.z;
+    }
+
+    public void updatePosition(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public UUID getId() {

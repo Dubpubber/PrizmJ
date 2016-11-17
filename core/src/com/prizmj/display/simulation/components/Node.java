@@ -1,6 +1,6 @@
-package com.prizmj.display.geometricnetworkmodel;
+package com.prizmj.display.simulation.components;
 
-import com.prizmj.display.buildingparts.*;
+import com.prizmj.display.parts.*;
 
 import java.util.UUID;
 

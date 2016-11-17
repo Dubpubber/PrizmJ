@@ -9,5 +9,6 @@ package com.prizmj.display;
  *  floors which, in turn, are comprised of rooms, hallways and stairways.
  *
  */
-public class Building {
+public class Blueprint {
+
 }
