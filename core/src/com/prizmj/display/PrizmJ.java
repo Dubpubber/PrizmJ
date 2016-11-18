@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.models.RoomModel;
 import com.prizmj.display.parts.BasicRoom;
 import com.prizmj.display.parts.Door;
@@ -63,22 +64,24 @@ public class PrizmJ extends ApplicationAdapter {
         modelBuilder = new ModelBuilder();
         Level floor = new Level(0);
         Blueprint print = new Blueprint(this, floor);
-        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 4, Color.GREEN);
-        print.addRoomPairToSpecificFloor(0, "fagRoom2", 0, 0, 0, 4, 4, Color.RED);
-        print.addRoomPairToSpecificFloor(0, "fagRoom3", 2, 0, 0, 4, 4, Color.RED);
-        print.addRoomPairToSpecificFloor(0, "fagRoom4", -2, 0, 0, 4, 4, Color.RED);
-        print.addRoomPairToSpecificFloor(0, "fagRoom5", 0, 0, 0, 4, 4, Color.RED);
+        Door door = new Door(3);
+        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 7, Color.GREEN);
+        print.addRoomPairToSpecificFloor(0, "fagRoom2", 0, 0, 0, 6, 6, Color.GOLD, door);
+//        print.addRoomPairToSpecificFloor(0, "fagRoom3", 2, 0, 0, 4, 4, Color.GOLDENROD);
+//        print.addRoomPairToSpecificFloor(0, "fagRoom4", -2, 0, 0, 4, 4, Color.DARK_GRAY);
+//        print.addRoomPairToSpecificFloor(0, "fagRoom5", 0, 0, 0, 4, 4, Color.ROYAL);
         print.updateModels();
 
         // Using the method I suggested, was way faster
         try {
-            print.attachRoomByAxis("fagRoom", "fagRoom2", Cardinal.NORTH);
-            print.attachRoomByAxis("fagRoom", "fagRoom3", Cardinal.NORTH);
-            print.attachRoomByAxis("fagRoom", "fagRoom4", Cardinal.NORTH);
-            print.attachRoomByAxis("fagRoom2", "fagRoom5", Cardinal.NORTH);
+            print.attachRoomByAxis("fagRoom", "fagRoom2", Cardinal.WEST);
+//            print.attachRoomByAxis("fagRoom", "fagRoom3", Cardinal.NORTH);
+//            print.attachRoomByAxis("fagRoom", "fagRoom4", Cardinal.NORTH);
+//            print.attachRoomByAxis("fagRoom2", "fagRoom5", Cardinal.NORTH);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(print.getRoomModelByName("fagRoom2")/*.getDoors().first().getSecondRoom().getRoom().getName()*/  );
 //        try {
 //            print.attachRoomWithPrejudice("fagRoom", new String[] {"fagRoom3", "fagRoom4", "fagRoom5"}, Cardinal.WEST, Cardinal.WEST);
 //        } catch (Exception e) {
@@ -115,13 +118,13 @@ public class PrizmJ extends ApplicationAdapter {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.W))
-            pCamera.translate(0, 0, -camSpeed);
+            pCamera.translate(-camSpeed, 0, -camSpeed);
         if(Gdx.input.isKeyPressed(Input.Keys.A))
-            pCamera.translate(-camSpeed, 0, 0);
+            pCamera.translate(-camSpeed, 0, camSpeed);
         if(Gdx.input.isKeyPressed(Input.Keys.S))
-            pCamera.translate(0, 0, camSpeed);
+            pCamera.translate(camSpeed, 0, camSpeed);
         if(Gdx.input.isKeyPressed(Input.Keys.D))
-            pCamera.translate(camSpeed, 0, 0);
+            pCamera.translate(camSpeed, 0, -camSpeed);
         if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
             camSpeed -= 0.25f;
         if(Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
@@ -137,6 +140,7 @@ public class PrizmJ extends ApplicationAdapter {
                 currentDimension = 3;
             }
         }
+
         camSpeed = MathUtils.clamp(camSpeed, 0, 5);
         if(Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             DEBUG = !DEBUG;

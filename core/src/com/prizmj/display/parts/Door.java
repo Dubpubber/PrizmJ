@@ -27,6 +27,7 @@ public class Door {
     private Cardinal cardinal;
 
     public Door(int side) {
+        //this.cardinal = cardinal;
         this.side = side;
     }
 

@@ -1,6 +1,7 @@
 package com.prizmj.display;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.particles.values.PrimitiveSpawnShapeValue;
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.models.RoomModel;
 import com.prizmj.display.parts.BasicRoom;
@@ -104,22 +105,31 @@ public class Blueprint {
         if(room2d_1 != null && room2d_2 != null && room3d_1 != null && room3d_2 != null) {
             switch(cardinal) {
                 case NORTH: // Wall 1
-                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() + (room3d_1.getRoom().getHeight() / 2)) + (room3d_2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
-                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() + (room2d_1.getRoom().getHeight() / 2)) + (room2d_2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
+                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() + (room3d_1.getRoom().getHeight() / 2)) + (room3d_2.getRoom().getHeight() / 2)) - (PrizmJ.WALL_THICKNESS / 2) - (PrizmJ.WALL_OFFSET /2));
+                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() + (room2d_1.getRoom().getHeight() / 2)) + (room2d_2.getRoom().getHeight() / 2)) - (PrizmJ.WALL_THICKNESS / 2) - (PrizmJ.WALL_OFFSET /2));
                     break;
                 case SOUTH: // Wall 2
-                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() - (room3d_1.getRoom().getHeight() / 2)) - (room3d_2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
-                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() - (room2d_1.getRoom().getHeight() / 2)) - (room2d_2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
+                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() - (room3d_1.getRoom().getHeight() / 2)) - (room3d_2.getRoom().getHeight() / 2)) + (PrizmJ.WALL_THICKNESS / 2) + (PrizmJ.WALL_OFFSET /2));
+                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() - (room2d_1.getRoom().getHeight() / 2)) - (room2d_2.getRoom().getHeight() / 2)) + (PrizmJ.WALL_THICKNESS / 2) + (PrizmJ.WALL_OFFSET /2));
                     break;
                 case EAST: // Wall 3
-                    room3d_2.moveTo(((room3d_1.getRoom().getX() - (room3d_1.getRoom().getWidth() / 2)) - (room3d_2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
-                    room2d_2.moveTo(((room2d_1.getRoom().getX() - (room2d_1.getRoom().getWidth() / 2)) - (room2d_2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
+                    room3d_2.moveTo((((room3d_1.getRoom().getX() - (room3d_1.getRoom().getWidth() / 2)) - (room3d_2.getRoom().getWidth() / 2)) + (PrizmJ.WALL_THICKNESS / 2) + (PrizmJ.WALL_OFFSET /2)), room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
+                    room2d_2.moveTo((((room2d_1.getRoom().getX() - (room2d_1.getRoom().getWidth() / 2)) - (room2d_2.getRoom().getWidth() / 2)) + (PrizmJ.WALL_THICKNESS / 2) + (PrizmJ.WALL_OFFSET /2)), room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
                     break;
                 case WEST: // Wall 4
-                    room3d_2.moveTo(((room3d_1.getRoom().getX() + (room3d_1.getRoom().getWidth() / 2)) + (room3d_2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
-                    room2d_2.moveTo(((room2d_1.getRoom().getX() + (room2d_1.getRoom().getWidth() / 2)) + (room2d_2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
+                    room3d_2.moveTo((((room3d_1.getRoom().getX() + (room3d_1.getRoom().getWidth() / 2)) + (room3d_2.getRoom().getWidth() / 2)) - (PrizmJ.WALL_THICKNESS / 2) - (PrizmJ.WALL_OFFSET /2)), room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
+                    room2d_2.moveTo((((room2d_1.getRoom().getX() + (room2d_1.getRoom().getWidth() / 2)) + (room2d_2.getRoom().getWidth() / 2)) - (PrizmJ.WALL_THICKNESS / 2) - (PrizmJ.WALL_OFFSET /2)), room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
                     break;
             }
+            // Attach a door, on the cardinal wall, from room2 to room1
+            room3d_2.getDoors().forEach((door) -> {
+                if (door.getCardinal() == cardinal && door.getSecondRoom() != null) {
+                    System.out.println("Door:"+door.getFirstRoom());
+                    door.setConnectedRoom(room3d_1);
+                } else {
+                    System.out.println("No doors found for room " + room3d_2.getRoom().getName());
+                }
+            });
         } else throw new Exception("Can't attach a room to a nonexistent room.");
     }
 
