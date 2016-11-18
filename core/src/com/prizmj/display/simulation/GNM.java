@@ -1,8 +1,9 @@
 package com.prizmj.display.simulation;
 
-import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.prizmj.display.Blueprint;
+import com.prizmj.display.simulation.components.DirectedGraph;
 import com.prizmj.display.simulation.components.Edge;
+import com.prizmj.display.simulation.components.Node;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -15,8 +16,7 @@ import com.prizmj.display.simulation.components.Edge;
  */
 public class GNM {
 
-    private Node[] nodes;
-    private Edge[] edges;
+    private DirectedGraph graph;
 
     public GNM(Blueprint blueprint) {
         create();
@@ -27,19 +27,15 @@ public class GNM {
         return 0;
     }
 
-    public Node[] getNodes() {
-        return nodes;
+    private void addEdge(Edge edge) {
+        graph.addEdge(edge);
     }
 
-    public Edge[] getEdges() {
-        return edges;
+    private void addNode(Node node) {
+        graph.addNode(node);
     }
 
-    public int getNumNodes() {
-        return nodes.length;
-    }
-
-    public int getNumEdges() {
-        return edges.length;
+    public DirectedGraph getGraph() {
+        return graph;
     }
 }
