@@ -22,6 +22,14 @@ public class Node {
 
     private Room room;
 
+    public Node(float xCen, float yCen, float floor, Room rm) {
+        x = xCen;
+        y = yCen;
+        z = floor;
+        room = rm;
+        smokeDensity = 0.0f;
+        walkingSpeed = 1.5f;
+    }
 
     public UUID getId() {
         return id;
