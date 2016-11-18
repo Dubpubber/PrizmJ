@@ -16,12 +16,18 @@ import com.prizmj.display.Blueprint;
 public class FireSimulator {
 
     private GNM gnm;
+    private Blueprint blueprint;
 
-    public void generateGNM(Blueprint blueprint) {
-        gnm = new GNM(blueprint);
+    public void generateGNM(Blueprint bprint, GNM agnm) {
+        gnm = agnm;
+        blueprint = bprint;
     }
 
     public GNM getGNM() {
         return gnm;
+    }
+
+    public void dijkstra() {
+
     }
 }
