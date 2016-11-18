@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.prizmj.display.models.RoomModel;
 import com.prizmj.display.parts.BasicRoom;
 import com.prizmj.display.parts.Door;
+import com.prizmj.display.parts.Level;
 
 public class PrizmJ extends ApplicationAdapter {
 
@@ -60,17 +61,20 @@ public class PrizmJ extends ApplicationAdapter {
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         modelBuilder = new ModelBuilder();
-        this.manager = new RenderManager(this);
-        manager.createBasicRoom2D3DPair("Room", 0, 0, 0, 12, 10, Color.GRAY, new Door(3));
-        manager.createBasicRoom2D3DPair("Hallway", 0, 0, 0, 13, 7, Color.GRAY);
-        manager.createBasicRoom2D3DPair("Room2", 0, 0, 0, 29, 29, Color.GRAY);
+        Level floor = new Level(0);
+        Blueprint print = new Blueprint(this, floor);
+        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 12, Color.GREEN);
+        print.addRoomPairToSpecificFloor(0, "fagRoom2", 0, 0, 0, 4, 4, Color.RED);
+        print.addRoomPairToSpecificFloor(0, "fagRoom3", 0, 0, 0, 4, 4, Color.RED);
+        print.addRoomPairToSpecificFloor(0, "fagRoom4", 0, 0, 0, 4, 4, Color.RED);
+        print.addRoomPairToSpecificFloor(0, "fagRoom5", 0, 0, 0, 4, 4, Color.RED);
+        print.updateModels();
         try {
-            // Get this room, and attach this one at this wall
-            manager.attachRoom("Room", "Hallway", Cardinal.NORTH);
-            manager.attachRoom("Room", "Room2", Cardinal.NORTH);
+            print.attachRoomWithPrejudice("fagRoom", new String[] {"fagRoom3", "fagRoom4", "fagRoom5"}, Cardinal.WEST, Cardinal.WEST);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.manager = new RenderManager(this, print);
         manager.switchDimension(currentDimension);
         if(DEBUG) {
             debugCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -95,7 +99,7 @@ public class PrizmJ extends ApplicationAdapter {
             font.draw(batch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), -315, 235);
             font.draw(batch, String.format("CamSpeed: %f", camSpeed), -315, 218);
             font.draw(batch, String.format("Total Memory: %dMB", Runtime.getRuntime().totalMemory() / (1024*1024)), -315, 201);
-            font.draw(batch, String.format("Room Count: %d", manager.getNumberofRooms()), -315, 164);
+            // font.draw(batch, String.format("Room Count: %d", manager.getNumberofRooms()), -315, 164);
             batch.end();
             debugCam.update();
         }

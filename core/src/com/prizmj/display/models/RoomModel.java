@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.Room;
@@ -26,9 +27,12 @@ public class RoomModel {
     private int dimension;
     private boolean toggle = true;
 
+    private Array<Door> doors;
+
     public RoomModel(Room room, ModelBuilder builder, int dimension) {
         this.room = room;
         this.dimension = dimension;
+        this.doors = new Array<>();
         if(dimension == 2)
             create2DRoom(builder);
         else
@@ -38,6 +42,7 @@ public class RoomModel {
     public RoomModel(Room room, ModelBuilder builder, int dimension, Door... doors) {
         this.room = room;
         this.dimension = dimension;
+        this.doors = new Array<>();
         if(dimension == 2)
             create2DRoom(builder);
         else
@@ -49,14 +54,6 @@ public class RoomModel {
     }
 
     public void create2DRoom(ModelBuilder builder) {
-        /*model = builder.createRect(
-                room.getP1().x, room.getP1().y, room.getP1().z,
-                room.getP2().x, room.getP2().y, room.getP2().z,
-                room.getP3().x, room.getP3().y, room.getP3().z,
-                room.getP4().x, room.getP4().y, room.getP4().z,
-                0, 1, 0, new Material(ColorAttribute.createDiffuse(room.getFloorColor())),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        instance = new ModelInstance(model, room.getX(), 0, room.getY());*/
         builder.begin();
         builder.node();
         MeshPartBuilder mpb = builder.part("basic_room", GL20.GL_TRIANGLES, VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position, new Material(ColorAttribute.createDiffuse(room.getFloorColor())));
@@ -111,108 +108,120 @@ public class RoomModel {
         else if(side == 2 && room.getWidth() % 2 != 0) side = 6;
         else if(side == 3 && room.getHeight() % 2 != 0) side = 7;
         else if(side == 4 && room.getHeight() % 2 != 0) side = 8;
-        System.out.println();
+        float x = 0;
+        float y = 0;
+        float z = 0;
         switch(side) {
             case 1: // Height case
+                x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = ((room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
                 // Wall 1 - Even
                 BoxShapeBuilder.build(mpb,
-                        MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2),
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        ((room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET,
+                        x, y, z,
                         PrizmJ.DOOR_DEPTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
                 break;
             case 2: // Height case
+                x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = ((-room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
                 // Wall 2 - Even
                 BoxShapeBuilder.build(mpb,
-                        MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2),
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        ((-room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET,
+                        x, y, z,
                         PrizmJ.DOOR_DEPTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
                 break;
             case 3: // Width case
+                x = ((-room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
                 // Wall 3 - Even
                 BoxShapeBuilder.build(mpb,
-                        ((-room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET,
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2),
+                        x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.DOOR_DEPTH
                 );
                 break;
             case 4: // Width case
+                x = ((room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
                 // Wall 4 - Even
                 BoxShapeBuilder.build(mpb,
-                        ((room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET,
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2),
+                        x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.DOOR_DEPTH
                 );
                 break;
             case 5: // Height case
+                x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = ((room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
                 // Wall 1 - Odd
                 BoxShapeBuilder.build(mpb,
-                        MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2),
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        ((room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET,
+                        x, y, z,
                         PrizmJ.DOOR_DEPTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
                 break;
             case 6: // Height case
+                x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = ((-room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
                 // Wall 2 - Odd
                 BoxShapeBuilder.build(mpb,
-                        MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2),
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        ((-room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET,
+                        x, y, z,
                         PrizmJ.DOOR_DEPTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
                 break;
             case 7: // Width case
+                x = ((-room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
                 // Wall 3 - Odd
                 BoxShapeBuilder.build(mpb,
-                        ((-room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET,
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2),
+                        x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.DOOR_DEPTH
                 );
                 break;
             case 8: // Width case
+                x = ((room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
+                y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
+                z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
                 // Wall 4 - Odd
                 BoxShapeBuilder.build(mpb,
-                        ((room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET,
-                        (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2),
-                        MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2),
+                        x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.DOOR_DEPTH)
                 ;
                 break;
         }
+        door.updatePosition(x, y, z);
+        doors.add(door);
     }
 
     public void moveTo(float x, float y, float z) {
-        System.out.println(room.getName());
         room.updatePosition(x, y, z);
         Node node = model.nodes.first();
-        System.out.println(node.globalTransform);
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
         instance.transform.set(node.globalTransform);
-        System.out.println("Instance Transform:\n " + instance.transform.toString());
-        System.out.println(node.globalTransform);
+    }
+
+    public Array<Door> getDoors() {
+        return doors;
     }
 
     public Room getRoom() {

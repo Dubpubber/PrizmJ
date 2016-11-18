@@ -14,7 +14,6 @@ public class DirectedGraph {
     // in an array list.
     private final Map<Node, ArrayList<Edge>> graph = new HashMap<>();
 
-
     /**
      * Adds a node to the graph. Does nothing if it is already added.
      *

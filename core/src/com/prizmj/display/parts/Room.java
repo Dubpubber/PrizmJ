@@ -27,8 +27,8 @@ public abstract class Room {
     private float x;
     private float y;
     private float z;
-    private int width;
-    private int height;
+    private float width;
+    private float height;
 
     private Color floorColor;
     // -- //
@@ -39,7 +39,7 @@ public abstract class Room {
      * Example implementation:
      *          new Room("BigRoom", 0, 0, 25, 25);
      */
-    public Room(String name, float x, float y, float z, int width, int height, Color floorColor) {
+    public Room(String name, float x, float y, float z, float width, float height, Color floorColor) {
         this.name = name;
         this.id = UUID.randomUUID();
         this.x = x;
@@ -102,19 +102,19 @@ public abstract class Room {
         this.y = y;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
