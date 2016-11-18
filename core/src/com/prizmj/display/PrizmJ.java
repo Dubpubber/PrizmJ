@@ -63,17 +63,27 @@ public class PrizmJ extends ApplicationAdapter {
         modelBuilder = new ModelBuilder();
         Level floor = new Level(0);
         Blueprint print = new Blueprint(this, floor);
-        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 12, Color.GREEN);
+        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 4, Color.GREEN);
         print.addRoomPairToSpecificFloor(0, "fagRoom2", 0, 0, 0, 4, 4, Color.RED);
-        print.addRoomPairToSpecificFloor(0, "fagRoom3", 0, 0, 0, 4, 4, Color.RED);
-        print.addRoomPairToSpecificFloor(0, "fagRoom4", 0, 0, 0, 4, 4, Color.RED);
+        print.addRoomPairToSpecificFloor(0, "fagRoom3", 2, 0, 0, 4, 4, Color.RED);
+        print.addRoomPairToSpecificFloor(0, "fagRoom4", -2, 0, 0, 4, 4, Color.RED);
         print.addRoomPairToSpecificFloor(0, "fagRoom5", 0, 0, 0, 4, 4, Color.RED);
         print.updateModels();
+
+        // Using the method I suggested, was way faster
         try {
-            print.attachRoomWithPrejudice("fagRoom", new String[] {"fagRoom3", "fagRoom4", "fagRoom5"}, Cardinal.WEST, Cardinal.WEST);
+            print.attachRoomByAxis("fagRoom", "fagRoom2", Cardinal.NORTH);
+            print.attachRoomByAxis("fagRoom", "fagRoom3", Cardinal.NORTH);
+            print.attachRoomByAxis("fagRoom", "fagRoom4", Cardinal.NORTH);
+            print.attachRoomByAxis("fagRoom2", "fagRoom5", Cardinal.NORTH);
         } catch (Exception e) {
             e.printStackTrace();
         }
+//        try {
+//            print.attachRoomWithPrejudice("fagRoom", new String[] {"fagRoom3", "fagRoom4", "fagRoom5"}, Cardinal.WEST, Cardinal.WEST);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         this.manager = new RenderManager(this, print);
         manager.switchDimension(currentDimension);
         if(DEBUG) {

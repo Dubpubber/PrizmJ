@@ -93,26 +93,69 @@ public class Blueprint {
         } else throw new Exception("Can't attach a room to a nonexistent room.");
     }
 
+
+    // Attaches rooms together the same as above, however, it only moves the room along the axis of the
+    // specified cardinal
+    public void attachRoomByAxis(String existingRoom, String attachingRoom, Cardinal cardinal) throws Exception {
+        RoomModel room2d_1 = getRoomModelByName(existingRoom + "_2d");
+        RoomModel room2d_2 = getRoomModelByName(attachingRoom + "_2d");
+        RoomModel room3d_1 = getRoomModelByName(existingRoom + "_3d");
+        RoomModel room3d_2 = getRoomModelByName(attachingRoom + "_3d");
+        if(room2d_1 != null && room2d_2 != null && room3d_1 != null && room3d_2 != null) {
+            switch(cardinal) {
+                case NORTH: // Wall 1
+                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() + (room3d_1.getRoom().getHeight() / 2)) + (room3d_2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
+                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() + (room2d_1.getRoom().getHeight() / 2)) + (room2d_2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
+                    break;
+                case SOUTH: // Wall 2
+                    room3d_2.moveTo(room3d_2.getRoom().getX(), room3d_1.getRoom().getY(), ((room3d_1.getRoom().getZ() - (room3d_1.getRoom().getHeight() / 2)) - (room3d_2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
+                    room2d_2.moveTo(room2d_2.getRoom().getX(), room2d_1.getRoom().getY(), ((room2d_1.getRoom().getZ() - (room2d_1.getRoom().getHeight() / 2)) - (room2d_2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
+                    break;
+                case EAST: // Wall 3
+                    room3d_2.moveTo(((room3d_1.getRoom().getX() - (room3d_1.getRoom().getWidth() / 2)) - (room3d_2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
+                    room2d_2.moveTo(((room2d_1.getRoom().getX() - (room2d_1.getRoom().getWidth() / 2)) - (room2d_2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
+                    break;
+                case WEST: // Wall 4
+                    room3d_2.moveTo(((room3d_1.getRoom().getX() + (room3d_1.getRoom().getWidth() / 2)) + (room3d_2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room3d_1.getRoom().getY(), room3d_2.getRoom().getZ());
+                    room2d_2.moveTo(((room2d_1.getRoom().getX() + (room2d_1.getRoom().getWidth() / 2)) + (room2d_2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room2d_1.getRoom().getY(), room2d_2.getRoom().getZ());
+                    break;
+            }
+        } else throw new Exception("Can't attach a room to a nonexistent room.");
+    }
+
+
     public void attachRoomWithPrejudice(String existingRoom, String[] attachingRooms, Cardinal initial, Cardinal direction) throws Exception {
-        RoomModel erm = getRoomModelByName(existingRoom + "_3d");
-        if(erm != null) {
+        RoomModel erm2D = getRoomModelByName(existingRoom + "_2d");
+        RoomModel erm3D = getRoomModelByName(existingRoom + "_3d");
+        if(erm2D != null && erm3D != null) {
             Array<RoomModel> rms = new Array<>();
-            for (String str : attachingRooms) rms.add(getRoomModelByName(str + "_3d"));
-            RoomModel irm = rms.get(0);
+            for (String str : attachingRooms) {
+                rms.add(getRoomModelByName(str + "_2d"));
+                rms.add(getRoomModelByName(str + "_3d"));
+            }
+
+            RoomModel irm2D = rms.get(0);
+            RoomModel irm3D = rms.get(1);
+            System.out.println("ByName:"+getRoomModelByName(existingRoom));
+            System.out.println("RMS:"+rms.peek());
             // Attach the first room then move then use it to create a cascading effect.
             attachRoom(existingRoom, attachingRooms[0], initial);
             switch (initial) {
                 case NORTH:
-                    irm.moveTo(erm.getRoom().getX() + (erm.getRoom().getWidth() / 2) - (irm.getRoom().getWidth() / 2), erm.getRoom().getY(), erm.getRoom().getZ());
+                    irm2D.moveTo(erm3D.getRoom().getX() + (erm3D.getRoom().getWidth() / 2) - (irm2D.getRoom().getWidth() / 2), erm3D.getRoom().getY(), erm3D.getRoom().getZ());
+                    irm3D.moveTo(erm3D.getRoom().getX() + (erm3D.getRoom().getWidth() / 2) - (irm3D.getRoom().getWidth() / 2), erm3D.getRoom().getY(), erm3D.getRoom().getZ());
                     break;
                 case SOUTH:
-                    irm.moveTo(erm.getRoom().getX() - (erm.getRoom().getWidth() / 2) + (irm.getRoom().getWidth() / 2), erm.getRoom().getY(), erm.getRoom().getZ());
+                    irm2D.moveTo(erm3D.getRoom().getX() - (erm3D.getRoom().getWidth() / 2) + (irm2D.getRoom().getWidth() / 2), erm3D.getRoom().getY(), erm3D.getRoom().getZ());
+                    irm3D.moveTo(erm3D.getRoom().getX() - (erm3D.getRoom().getWidth() / 2) + (irm3D.getRoom().getWidth() / 2), erm3D.getRoom().getY(), erm3D.getRoom().getZ());
                     break;
                 case EAST:
-                    irm.moveTo(erm.getRoom().getX(), erm.getRoom().getY(), erm.getRoom().getZ() + (erm.getRoom().getWidth() / 2) - (irm.getRoom().getWidth() / 2));
+                    irm2D.moveTo(erm3D.getRoom().getX(), erm3D.getRoom().getY(), erm3D.getRoom().getZ() + (erm3D.getRoom().getWidth() / 2) - (irm2D.getRoom().getWidth() / 2));
+                    irm3D.moveTo(erm3D.getRoom().getX(), erm3D.getRoom().getY(), erm3D.getRoom().getZ() + (erm3D.getRoom().getWidth() / 2) - (irm3D.getRoom().getWidth() / 2));
                     break;
                 case WEST:
-                    irm.moveTo(erm.getRoom().getX(), erm.getRoom().getY(), erm.getRoom().getZ() - (erm.getRoom().getWidth() / 2) + (irm.getRoom().getWidth() / 2));
+                    irm2D.moveTo(erm3D.getRoom().getX(), erm3D.getRoom().getY(), erm3D.getRoom().getZ() - (erm3D.getRoom().getWidth() / 2) + (irm2D.getRoom().getWidth() / 2));
+                    irm3D.moveTo(erm3D.getRoom().getX(), erm3D.getRoom().getY(), erm3D.getRoom().getZ() - (erm3D.getRoom().getWidth() / 2) + (irm3D.getRoom().getWidth() / 2));
                     break;
             }
             rms.forEach(roomModel -> {
@@ -122,8 +165,15 @@ public class Blueprint {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (!Objects.equals(roomModel.getRoom().getName(), attachingRooms[0] + "_2d")) {
+                    try {
+                        attachRoom(attachingRooms[0] + "_2d", roomModel.getRoom().getName(), direction);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                roomModel.getDoors().forEach(door -> door.setConnectedRoom(erm));
+                System.out.println(roomModel.toString());
+                roomModel.getDoors().forEach(door -> door.setConnectedRoom(erm3D));
             });
         }
     }
