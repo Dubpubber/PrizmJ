@@ -2,7 +2,7 @@ package com.prizmj.display.simulation;
 
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.simulation.components.Edge;
-import com.prizmj.display.simulation.components.Node;
+import com.prizmj.display.simulation.components.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,22 +15,22 @@ public class DirectedGraph {
 
     // Map of Nodes to outgoing Edges. Each set of edges is stored
     // in an array list.
-    private final Map<Node, Array<Edge>> graph = new HashMap<>();
+    private final Map<Vertex, Array<Edge>> graph = new HashMap<>();
 
     /**
      * Adds a node to the graph. Does nothing if it is already added.
      *
-     * @param node - The node to add
+     * @param vertex - The node to add
      * @return - True if successful, false otherwise
      */
-    public boolean addNode(Node node) {
+    public boolean addVertex(Vertex vertex) {
 
         // If the node is in the graph, do nothing
-        if (graph.containsKey(node))
+        if (graph.containsKey(vertex))
             return false;
 
         // Add the node to the graph with an empty set of edges.
-        graph.put(node, new Array<>());
+        graph.put(vertex, new Array<>());
         return true;
     }
 
@@ -72,7 +72,7 @@ public class DirectedGraph {
      * @param start - Start node of edge to remove
      * @param end - End node of edge to remove
      */
-    public void removeEdge(Node start, Node end) {
+    public void removeEdge(Vertex start, Vertex end) {
         // Ensure both nodes exist in the graph
         if (!graph.containsKey(start) || !graph.containsKey(end))
             throw new NoSuchElementException("Both nodes must exist in the graph.");
@@ -87,7 +87,7 @@ public class DirectedGraph {
 
     }
 
-    public Map<Node, Array<Edge>> getGraph() {
+    public Map<Vertex, Array<Edge>> getGraph() {
         return graph;
     }
 

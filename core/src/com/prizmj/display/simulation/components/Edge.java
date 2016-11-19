@@ -11,8 +11,8 @@ public class Edge {
 
     private UUID id;
 
-    private Node start;
-    private Node end;
+    private Vertex start;
+    private Vertex end;
 
     private float length;
     private float walkingSpeed;
@@ -25,19 +25,19 @@ public class Edge {
         this.id = id;
     }
 
-    public Node getStart() {
+    public Vertex getStart() {
         return start;
     }
 
-    public void setStart(Node start) {
+    public void setStart(Vertex start) {
         this.start = start;
     }
 
-    public Node getEnd() {
+    public Vertex getEnd() {
         return end;
     }
 
-    public void setEnd(Node end) {
+    public void setEnd(Vertex end) {
         this.end = end;
     }
 

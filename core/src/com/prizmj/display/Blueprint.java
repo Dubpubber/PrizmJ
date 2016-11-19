@@ -1,11 +1,12 @@
 package com.prizmj.display;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.models.RoomModel;
 import com.prizmj.display.parts.*;
 import com.prizmj.display.simulation.GNM;
-import com.prizmj.display.simulation.components.Node;
+import com.prizmj.display.simulation.components.Vertex;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,8 +53,8 @@ public class Blueprint {
     public void addRoomToSpecificFloor(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor) {
         RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder());
         Optional.ofNullable(getSpecificFloor(level)).ifPresent(lvl -> lvl.addAll(roomModel));
-        Node node = new Node(0, 0, 0.5f, roomModel.getRoom());
-        geometricNetworkModel.addNode(node);
+        Vertex vertex = new Vertex(0, 0, 0, roomModel.getRoom());
+        geometricNetworkModel.addVertex(vertex, new Vector3(0, 1.5f, 0));
     }
 
     @Deprecated

@@ -1,20 +1,18 @@
 package com.prizmj.display.simulation;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.Blueprint;
 import com.prizmj.display.PrizmJ;
-import com.prizmj.display.RenderManager;
 import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
-import com.prizmj.display.simulation.components.Node;
+import com.prizmj.display.simulation.components.Vertex;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -52,14 +50,15 @@ public class GNM {
         graph.addEdge(edge);
     }
 
-    public void addNode(Node node) {
-        graph.addNode(node);
-        node.setModel(modelBuilder.createSphere(
-                2, 2, 2,
+    public void addVertex(Vertex vertex, Vector3 vector3) {
+        graph.addVertex(vertex);
+        vertex.setModel(modelBuilder.createSphere(
+                1, 1, 1,
                 16, 16,
-                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                new Material(ColorAttribute.createDiffuse(Color.CYAN)),
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         ));
+        vertex.moveTo(vector3.x, vector3.y, vector3.z);
     }
 
     public void render(ModelBatch batch, Environment environment) {

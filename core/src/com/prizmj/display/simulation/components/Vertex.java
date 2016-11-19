@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.prizmj.display.PrizmJ;
+import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.prizmj.display.parts.abstracts.Room;
 
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 
 // TODO: Possible inner class?
-public class Node {
+public class Vertex {
 
     private UUID id;
 
@@ -30,7 +30,7 @@ public class Node {
     private Model model;
     private ModelInstance modelInstance;
 
-    public Node(float xCen, float yCen, float z, Room rm) {
+    public Vertex(float xCen, float yCen, float z, Room rm) {
         this.x = xCen;
         this.y = yCen;
         this.z = z;
@@ -41,6 +41,12 @@ public class Node {
 
     public void render(ModelBatch batch, Environment environment) {
         batch.render(modelInstance, environment);
+    }
+
+    public void moveTo(float x, float y, float z) {
+        Node node = model.nodes.first();
+        node.globalTransform.translate(x, y, z);
+        modelInstance.transform.set(node.globalTransform);
     }
 
     public UUID getId() {
