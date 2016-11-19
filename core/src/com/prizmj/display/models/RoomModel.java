@@ -1,8 +1,10 @@
 package com.prizmj.display.models;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
@@ -30,11 +33,19 @@ public class RoomModel {
 
     private Array<Door> doors;
 
+    /* Simulation objects */
+    private Model smokeCube;
+    private ModelInstance smokeCubeInstance;
+    private boolean showingSmoke = true;
+    private float smokeDensity = 0;
+    private boolean simulationRunning = false;
+
     public RoomModel(Room room, ModelBuilder builder) {
         this.room = room;
         this.doors = new Array<>();
         create2DRoom(builder);
         create3DRoom(builder);
+        createSmokeCube(builder, .5f);
     }
 
     public RoomModel(Room room, ModelBuilder builder, Door... doors) {
@@ -42,12 +53,14 @@ public class RoomModel {
         this.doors = new Array<>();
         create2DRoom(builder);
         create3DRoom(builder, doors);
+        createSmokeCube(builder, .5f);
     }
 
     public void render(ModelBatch modelBatch, Environment environment) {
-        if(view == Dimension.Environment_3D)
+        if(view == Dimension.Environment_3D) {
             modelBatch.render(instance_3d, environment);
-        else
+            if(showingSmoke) modelBatch.render(smokeCubeInstance, environment);
+        } else
             modelBatch.render(instance_2d, environment);
     }
 
@@ -158,6 +171,24 @@ public class RoomModel {
         door.updatePosition(x, y, z);
     }
 
+    public void createSmokeCube(ModelBuilder builder, float smokeDensity) {
+        Material mat = new Material();
+        mat.set(ColorAttribute.createDiffuse(new Color(0.498f, 0.498f, 0.498f, 1)));
+        mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, smokeDensity));
+        this.smokeCube = builder.createBox(
+                room.getWidth(),
+                PrizmJ.WALL_HEIGHT,
+                (room.getWidth() + room.getHeight()) / 2,
+                mat,
+                VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
+        );
+        this.smokeCubeInstance = new ModelInstance(smokeCube);
+        Node node = smokeCube.nodes.first();
+        node.globalTransform.translate(room.getX(), room.getY() + (PrizmJ.WALL_HEIGHT / 2), room.getZ());
+        smokeCubeInstance.transform.set(node.globalTransform);
+        this.smokeDensity = smokeDensity;
+    }
+
     public void moveTo(float x, float y, float z) {
         Node node = null;
         room.updatePosition(x, y, z);
@@ -169,6 +200,10 @@ public class RoomModel {
         node = model_2d.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
         instance_2d.transform.set(node.globalTransform);
+        // Finally, move the smoke cube
+        node = smokeCube.nodes.first();
+        node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
+        smokeCubeInstance.transform.set(node.globalTransform);
     }
 
     public void recreateRoom(ModelBuilder builder, Door... doors) {
@@ -188,6 +223,25 @@ public class RoomModel {
         }
     }
 
+    public void recreateSmokeCube(ModelBuilder builder, float smokeDensity) {
+        createSmokeCube(builder, smokeDensity);
+    }
+
+    public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed) {
+        this.simulationRunning = true;
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
+                if(getSmokeDensity() > apexPoint) {
+                    simulationRunning = false;
+                    System.out.println("Finished simulating smoke.");
+                    cancel();
+                }
+            }
+        }, 0, repeatSpeed);
+    }
+
     public Array<Door> getDoors() {
         return doors;
     }
@@ -202,5 +256,21 @@ public class RoomModel {
 
     public Dimension getDimensionView() {
         return view;
+    }
+
+    public float getSmokeDensity() {
+        return smokeDensity;
+    }
+
+    public boolean isShowingSmoke() {
+        return showingSmoke;
+    }
+
+    public void setShowingSmoke(boolean showingSmoke) {
+        this.showingSmoke = showingSmoke;
+    }
+
+    public boolean isSimulationRunning() {
+        return simulationRunning;
     }
 }
