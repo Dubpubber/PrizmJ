@@ -1,15 +1,15 @@
 package com.prizmj.display;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.models.RoomModel;
-import com.prizmj.display.parts.*;
+import com.prizmj.display.parts.BasicRoom;
+import com.prizmj.display.parts.Door;
+import com.prizmj.display.parts.Hallway;
+import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.simulation.GNM;
-import com.prizmj.display.simulation.components.Vertex;
 
 import java.util.Objects;
-import java.util.Optional;
 
 
 /**
@@ -25,86 +25,56 @@ public class Blueprint {
 
     private PrizmJ prizmJ;
 
-    // Array of all the floors //
-    private Array<Level> floors;
-
-    // Array of all models IN BUILDING. //
+    // Array of all models in the entire building. //
     private Array<RoomModel> models;
 
     private GNM geometricNetworkModel;
 
-    public Blueprint(PrizmJ prizmJ, Level... floors) {
+    public Blueprint(PrizmJ prizmJ) {
         this.prizmJ = prizmJ;
-        this.floors = new Array<>(floors);
         this.models = new Array<>();
         this.geometricNetworkModel = new GNM(prizmJ, this);
-        updateModels();
     }
 
-    public Array<Level> getFloors() {
-        return floors;
+    public RoomModel createBasicRoom(String roomName, float x, float y, float z, float width, float height, Color roomColor) {
+        return addRoomModelRenderQueue(new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder()));
     }
 
-    public void updateModels() {
-        if(floors != null && floors.size > 0)
-            floors.forEach(lvl -> models.addAll(lvl.getAllRooms()));
+    public RoomModel createAttachingRoom(String existingRoom, String roomName, float width, float height, Color roomColor, Cardinal direction) throws Exception {
+        RoomModel model = createBasicRoom(roomName, 0, 0, 0, width, height, roomColor);
+        attachRoomByAxis(existingRoom, roomName, direction);
+        return model;
     }
 
-    public void addRoomToSpecificFloor(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor) {
-        RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder());
-        Optional.ofNullable(getSpecificFloor(level)).ifPresent(lvl -> lvl.addAll(roomModel));
-        Vertex vertex = new Vertex(0, 0, 0, roomModel.getRoom());
-        geometricNetworkModel.addVertex(vertex, new Vector3(0, 1.5f, 0));
+    public RoomModel createHallway(String roomName, float x, float y, float z, float width, float height, Color roomColor, boolean updown) {
+        return addRoomModelRenderQueue(new RoomModel(new Hallway(roomName, x, y, z, width, height, roomColor, updown), prizmJ.getModelBuilder()));
     }
 
-    @Deprecated
-    public void addRoomToSpecificFloor(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor, Door... doors) {
-        RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder(), doors);
-        if(doors != null && doors.length > 0) for(Door door : doors) door.setInitialRoom(roomModel);
-        Optional.ofNullable(getSpecificFloor(level)).ifPresent(lvl -> lvl.addAll(roomModel));
+    public RoomModel createAttachingHallway(String existingRoom, String hallwayName, float width, float height, Color hallwayColor, boolean updown, Cardinal direction) throws Exception {
+        RoomModel model = createHallway(hallwayName, 0, 0, 0, width, height, hallwayColor, updown);
+        attachRoomByAxis(existingRoom, hallwayName, direction);
+        return model;
     }
 
-    public void addHallway(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor, boolean updown) {
-        RoomModel roomModel = new RoomModel(new Hallway(roomName, x, y, z, width, height, roomColor, updown), prizmJ.getModelBuilder());
-        Optional.ofNullable(getSpecificFloor(level)).ifPresent(lvl -> lvl.addAll(roomModel));
+    public RoomModel createStairwell(String stairwayName, float x, float y, float z) {
+        return addRoomModelRenderQueue(new RoomModel(new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR), prizmJ.getModelBuilder()));
     }
 
-    public void addStairwell(int startingLevel, String stairwayName, float x, float y, float z) {
-        RoomModel roomModel = new RoomModel(new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR), prizmJ.getModelBuilder());
-        Optional.ofNullable(getSpecificFloor(startingLevel)).ifPresent(lvl -> lvl.addAll(roomModel));
+    public RoomModel createAttachingStairwell(String existingRoom, String hallwayName, Cardinal direction) throws Exception {
+        RoomModel model = createStairwell(hallwayName, 0, 0, 0);
+        attachRoomByAxis(existingRoom, hallwayName, direction);
+        return model;
     }
 
-    public void addAndAttachStairwell(String downstairs, String stairwayName) {
+    public void createAttachingStairwell(String downstairs, String stairwayName) {
         Stairwell well = new Stairwell(stairwayName, 0, 0, 0, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR);
         RoomModel roomModel = new RoomModel(well, prizmJ.getModelBuilder());
-        Optional.ofNullable(getSpecificFloor(0)).ifPresent(lvl -> lvl.addAll(roomModel));
+        addRoomModelRenderQueue(roomModel);
         if(downstairs != null) {
             well.setDownstairs(downstairs);
             RoomModel well2 = getRoomModelByName(downstairs);
             roomModel.moveTo(well2.getRoom().getX(), well2.getRoom().getY() + PrizmJ.WALL_HEIGHT, well2.getRoom().getZ());
         }
-    }
-
-    @Deprecated
-    public void attachRoom(String existingRoom, String attachingRoom, Cardinal cardinal) throws Exception {
-        RoomModel room1 = getRoomModelByName(existingRoom);
-        RoomModel room2 = getRoomModelByName(attachingRoom);
-        if(room1 != null && room2 != null) {
-            switch(cardinal) {
-                case NORTH: // Wall 1
-                    room2.moveTo(room1.getRoom().getX(), room1.getRoom().getY(), ((room1.getRoom().getZ() + (room1.getRoom().getHeight() / 2)) + (room2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
-                    break;
-                case SOUTH: // Wall 2
-                    room2.moveTo(room1.getRoom().getX(), room1.getRoom().getY(), ((room1.getRoom().getZ() - (room1.getRoom().getHeight() / 2)) - (room2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
-                    break;
-                case EAST: // Wall 3
-                    room2.moveTo(((room1.getRoom().getX() - (room1.getRoom().getWidth() / 2)) - (room2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room1.getRoom().getY(), room1.getRoom().getZ());
-                    break;
-                case WEST: // Wall 4
-                    room2.moveTo(((room1.getRoom().getX() + (room1.getRoom().getWidth() / 2)) + (room2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room1.getRoom().getY(), room1.getRoom().getZ());
-                    break;
-            }
-        } else throw new Exception("Can't attach a room to a nonexistent room.");
     }
 
     /**
@@ -134,19 +104,40 @@ public class Blueprint {
                     room2.moveTo((((room1.getRoom().getX() + (room1.getRoom().getWidth() / 2)) + (room2.getRoom().getWidth() / 2)) - (PrizmJ.WALL_THICKNESS / 2) - (PrizmJ.WALL_OFFSET /2)), room1.getRoom().getY(), room2.getRoom().getZ());
                     break;
             }
-            // Attach a door, on the cardinal wall, from room2 to room1
-            /*room2.getDoors().forEach((door) -> {
-                if (door.getCardinal() == cardinal && door.getSecondRoom() != null) {
-                    door.setConnectedRoom(room1);
-                } else {
-                    System.out.println("No doors found for room " + room2.getRoom().getName());
-                }
-            });*/
-            // IF you want to create a door in this process, you have to recreate the room. (updates the instance) It's actually easy:
+            // #NeverForget the struggle with this and the eventual half-hour agree to disagree that ended up being my fault. //
             room2.recreateRoomByAttachment(prizmJ.getModelBuilder(), room1, new Door(Cardinal.getOpposite(cardinal)));
         } else throw new Exception("Can't attach a room to a nonexistent room.");
     }
 
+    private RoomModel addRoomModelRenderQueue(RoomModel model) {
+        if(model != null) models.add(model);
+        return model;
+    }
+
+    public Array<RoomModel> getAllModels() {
+        return models;
+    }
+
+    public RoomModel getRoomModelByName(String name) {
+        final RoomModel[] room = {null};
+        models.forEach(roomModel -> {
+            if(roomModel.getRoom().getName().compareTo(name) == 0) room[0] = roomModel;
+        });
+        return room[0];
+    }
+
+    /**
+     * Should always be called last, after the building is created!
+     */
+    public void createGraph() {
+        geometricNetworkModel.compile(this);
+    }
+
+    public GNM getGeometricNetworkModel() {
+        return geometricNetworkModel;
+    }
+
+    @Deprecated
     public void attachRoomWithPrejudice(String existingRoom, String[] attachingRooms, Cardinal initial, Cardinal direction) throws Exception {
         RoomModel erm2D = getRoomModelByName(existingRoom + "_2d");
         RoomModel erm3D = getRoomModelByName(existingRoom + "_3d");
@@ -195,44 +186,31 @@ public class Blueprint {
         }
     }
 
-    public RoomModel getRoomModelByName(String name) {
-        final RoomModel[] room = {null};
-        models.forEach(roomModel -> {
-            if(roomModel.getRoom().getName().compareTo(name) == 0) room[0] = roomModel;
-        });
-        return room[0];
+    @Deprecated
+    public void addRoomToSpecificFloor(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor, Door... doors) {
+        RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder(), doors);
+        if(doors != null && doors.length > 0) for(Door door : doors) door.setInitialRoom(roomModel);
     }
 
-    private Level getSpecificFloor(int level) {
-         return (floors.get(level) != null) ? floors.get(level) : null;
-    }
-
-    // Crazy method, ignore for now
-    private void generateFloor(int numRooms, int minBuildingWidth, int maxBuildingWidth) {
-        double sx,sy;
-
-        double px = Math.ceil(Math.sqrt(numRooms * minBuildingWidth / maxBuildingWidth));
-        if(Math.floor(px * maxBuildingWidth / minBuildingWidth) * px < numRooms)  //does not fit, y/(x/px)=px*y/x
-            sx = maxBuildingWidth / Math.ceil(px * maxBuildingWidth / minBuildingWidth);
-        else
-            sx = minBuildingWidth / px;
-
-        double py = Math.ceil(Math.sqrt(numRooms * maxBuildingWidth / minBuildingWidth));
-        if(Math.floor(py * minBuildingWidth / maxBuildingWidth) * py < numRooms)  //does not fit
-            sy = minBuildingWidth / Math.ceil(minBuildingWidth * py / maxBuildingWidth);
-        else
-            sy = minBuildingWidth / py;
-
-        float num = (float) Math.max(sx,sy);
-        Level floor = new Level(0);
-        for(int x = 0; x < numRooms; x++) {
-            // RoomModel model = new RoomModel(new BasicRoom("room_" + x + "_", x, 0, 5, num, num, Color.RED), prizmJ.getModelBuilder(), 3);
-            // floor.addAll(model);
-        }
-        floors.add(floor);
-    }
-
-    public GNM getGeometricNetworkModel() {
-        return geometricNetworkModel;
+    @Deprecated
+    public void attachRoom(String existingRoom, String attachingRoom, Cardinal cardinal) throws Exception {
+        RoomModel room1 = getRoomModelByName(existingRoom);
+        RoomModel room2 = getRoomModelByName(attachingRoom);
+        if(room1 != null && room2 != null) {
+            switch(cardinal) {
+                case NORTH: // Wall 1
+                    room2.moveTo(room1.getRoom().getX(), room1.getRoom().getY(), ((room1.getRoom().getZ() + (room1.getRoom().getHeight() / 2)) + (room2.getRoom().getHeight() / 2)) + PrizmJ.WALL_THICKNESS);
+                    break;
+                case SOUTH: // Wall 2
+                    room2.moveTo(room1.getRoom().getX(), room1.getRoom().getY(), ((room1.getRoom().getZ() - (room1.getRoom().getHeight() / 2)) - (room2.getRoom().getHeight() / 2)) - PrizmJ.WALL_THICKNESS);
+                    break;
+                case EAST: // Wall 3
+                    room2.moveTo(((room1.getRoom().getX() - (room1.getRoom().getWidth() / 2)) - (room2.getRoom().getWidth() / 2)) - PrizmJ.WALL_THICKNESS, room1.getRoom().getY(), room1.getRoom().getZ());
+                    break;
+                case WEST: // Wall 4
+                    room2.moveTo(((room1.getRoom().getX() + (room1.getRoom().getWidth() / 2)) + (room2.getRoom().getWidth() / 2)) + PrizmJ.WALL_THICKNESS, room1.getRoom().getY(), room1.getRoom().getZ());
+                    break;
+            }
+        } else throw new Exception("Can't attach a room to a nonexistent room.");
     }
 }

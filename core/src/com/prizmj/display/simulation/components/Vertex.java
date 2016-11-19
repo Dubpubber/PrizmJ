@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.parts.abstracts.Room;
 
 import java.util.UUID;
@@ -30,9 +31,9 @@ public class Vertex {
     private Model model;
     private ModelInstance modelInstance;
 
-    public Vertex(float xCen, float yCen, float z, Room rm) {
-        this.x = xCen;
-        this.y = yCen;
+    public Vertex(float x, float y, float z, Room rm) {
+        this.x = x;
+        this.y = y;
         this.z = z;
         room = rm;
         smokeDensity = 0.0f;
@@ -47,6 +48,10 @@ public class Vertex {
         Node node = model.nodes.first();
         node.globalTransform.translate(x, y, z);
         modelInstance.transform.set(node.globalTransform);
+    }
+
+    public void updatePosition() {
+        moveTo(x, y, z);
     }
 
     public UUID getId() {
@@ -121,4 +126,10 @@ public class Vertex {
     public void setModelInstance(ModelInstance modelInstance) {
         this.modelInstance = modelInstance;
     }
+
+    @Override
+    public String toString() {
+        return new Vector3(getX(), getY(), getZ()).toString();
+    }
+
 }

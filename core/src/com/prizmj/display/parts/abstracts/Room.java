@@ -104,4 +104,13 @@ public abstract class Room {
     public float getZ() {
         return z;
     }
+
+    @Override
+    public String toString() {
+        return getName() + ":\n " +
+                "\tLocation: " + new Vector3(x, y, z).toString() + "\n" +
+                "\t(W,H): " + String.format("(%f, %f)", width, height) + "\n" +
+                "\tColor: " + floorColor;
+    }
+
 }

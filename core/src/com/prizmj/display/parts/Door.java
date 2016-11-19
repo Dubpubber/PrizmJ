@@ -85,4 +85,9 @@ public class Door {
         this.cardinal = cardinal;
     }
 
+    @Override
+    public String toString() {
+        return (getFirstRoom() != null) ? "Room 1: " + getFirstRoom().getRoom().getName() + "\n\tDoor Loc:" + new Vector3(x, y, z).toString() : "Door Loc:" + new Vector3(x, y, z).toString();
+    }
+
 }

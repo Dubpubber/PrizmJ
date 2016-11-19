@@ -15,11 +15,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
-import com.prizmj.display.models.RoomModel;
-import com.prizmj.display.parts.BasicRoom;
-import com.prizmj.display.parts.Door;
-import com.prizmj.display.parts.Level;
 
 public class PrizmJ extends ApplicationAdapter {
 
@@ -165,25 +160,23 @@ public class PrizmJ extends ApplicationAdapter {
     }
 
     public void createBuilding() throws Exception {
-        Level floor = new Level(0);
-        Blueprint print = new Blueprint(this, floor);
-        System.out.println(floorplan);
-        switch (floorplan) {
-            case 1:
-                print.addHallway(0, "hallway1", 0, 0, 0, 20, 4, Color.RED, true);
-                print.addRoomToSpecificFloor(0, "room1", 0, 0, 0, 5, 5, Color.BLUE);
-                print.updateModels();
-                print.attachRoomByAxis("hallway1", "room1", Cardinal.NORTH);
-                break;
-            default:
-                print.addHallway(0, "hallway1", 0, 0, 0, 20, 4, Color.BLUE, true);
-                print.addRoomToSpecificFloor(0, "room1", 0, 0, 0, 5, 5, Color.RED);
-                print.updateModels();
-                print.attachRoomByAxis("hallway1", "room1", Cardinal.NORTH);
-                floorplan = 0;
-                break;
+        Blueprint print = new Blueprint(this);
+        try {
+            switch (floorplan) {
+                case 1:
+                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.WHITE);
+                    print.createAttachingRoom("FirstRoom", "SecondRoom", 10, 10, Color.RED, Cardinal.NORTH);
+                    print.createAttachingStairwell("FirstRoom", "Well1", Cardinal.EAST);
+                    break;
+                default:
+                    floorplan = 0;
+                    break;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-        this.manager = new RenderManager(this, print);
+        print.createGraph();
+        this.manager = new RenderManager(print);
     }
 
 }

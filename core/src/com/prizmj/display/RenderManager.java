@@ -7,25 +7,32 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
  * com.prizmj.display.RenderManager in PrizmJ
  */
 public class RenderManager {
-    private PrizmJ prizmJ;
+
+    private boolean rooms = true;
+    private boolean graph = true;
+
     private Blueprint blueprint;
 
-    public RenderManager(PrizmJ prizmJ, Blueprint blueprint) {
-        this.prizmJ = prizmJ;
+    public RenderManager(Blueprint blueprint) {
         this.blueprint = blueprint;
     }
 
     public void switchDimension(Dimension dimension) {
-        blueprint.getFloors().forEach(floor ->
-                floor.getAllRooms().forEach(rm -> rm.setDimensionView(dimension))
-        );
+        blueprint.getAllModels().forEach(model -> model.setDimensionView(dimension));
     }
 
     public void render(ModelBatch modelBatch, Environment environment) {
-        blueprint.getFloors().forEach(floor -> floor.getAllRooms().forEach(rm -> {
-            rm.render(modelBatch, environment);
-        }));
-        blueprint.getGeometricNetworkModel().render(modelBatch, environment);
+        if(rooms)
+            blueprint.getAllModels().forEach(model -> model.render(modelBatch, environment));
+        if(graph)
+            blueprint.getGeometricNetworkModel().render(modelBatch, environment);
     }
 
+    public void setRooms(boolean rooms) {
+        this.rooms = rooms;
+    }
+
+    public void setGraph(boolean graph) {
+        this.graph = graph;
+    }
 }

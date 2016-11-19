@@ -100,7 +100,7 @@ public class RoomModel {
 
     private void createDoor(ModelBuilder builder, Door door) {
         int side = door.getSide();
-        MeshPartBuilder mpb = builder.part("basic_room_room", GL20.GL_TRIANGLES, VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position, new Material(ColorAttribute.createDiffuse(PrizmJ.DOOR_COLOR)));
+        MeshPartBuilder mpb = builder.part("basic_room", GL20.GL_TRIANGLES, VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position, new Material(ColorAttribute.createDiffuse(PrizmJ.DOOR_COLOR)));
         if(side < 1 || side > 4) side = MathUtils.random(1, 4);
         float x = 0;
         float y = 0;
