@@ -164,7 +164,7 @@ public class PrizmJ extends ApplicationAdapter {
         try {
             switch (floorplan) {
                 case 1:
-                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.WHITE);
+                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.WHITE).moveTo(0, 0, 0);
                     print.createAttachingRoom("FirstRoom", "SecondRoom", 10, 10, Color.RED, Cardinal.NORTH);
                     print.createAttachingStairwell("FirstRoom", "Well1", Cardinal.EAST);
                     break;
@@ -176,6 +176,7 @@ public class PrizmJ extends ApplicationAdapter {
             e.printStackTrace();
         }
         print.createGraph();
+        print.getRoomModelByName("FirstRoom").startSmokeSimulation(modelBuilder, 0.9f, 0.02f, 0.5f);
         this.manager = new RenderManager(print);
     }
 }

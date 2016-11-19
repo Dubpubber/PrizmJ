@@ -20,12 +20,9 @@ public class DirectedGraph {
 
     public Array<Vertex> getVertices() {
         Array<Vertex> vertices = new Array<>();
-        graph.keySet().forEach(vertex -> {
-            vertices.add(vertex);
-        });
+        vertices.addAll(graph.keySet().toArray(new Vertex[graph.size()]));
         return vertices;
     }
-
 
     /**
      * Adds a node to the graph. Does nothing if it is already added.
