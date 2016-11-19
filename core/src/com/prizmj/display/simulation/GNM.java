@@ -1,8 +1,18 @@
 package com.prizmj.display.simulation;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.prizmj.display.Blueprint;
-import com.prizmj.display.parts.Room;
-import com.prizmj.display.simulation.components.DirectedGraph;
+import com.prizmj.display.PrizmJ;
+import com.prizmj.display.RenderManager;
+import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Node;
 
@@ -17,23 +27,45 @@ import com.prizmj.display.simulation.components.Node;
  */
 public class GNM {
 
+    private PrizmJ prizmJ;
+    private ModelBuilder modelBuilder;
+
     private DirectedGraph graph;
 
-    public GNM(Blueprint blueprint) {
-        create();
+    private Blueprint blueprint;
+
+    private int retardVar = create();
+
+    public GNM(PrizmJ prizmJ, Blueprint blueprint) {
+        this.prizmJ = prizmJ;
+        this.blueprint = blueprint;
+        this.modelBuilder = prizmJ.getModelBuilder();
+        this.graph = new DirectedGraph();
     }
 
-    // TODO: Make enum
+    // TODO: I'm retarded - Grimace
     private int create() {
-        return 0;
+        return 1 + 2 + 3;
     }
 
     private void addEdge(Edge edge) {
         graph.addEdge(edge);
     }
 
-    private void addNode(Node node) {
+    public void addNode(Node node) {
         graph.addNode(node);
+        node.setModel(modelBuilder.createSphere(
+                2, 2, 2,
+                16, 16,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
+        ));
+    }
+
+    public void render(ModelBatch batch, Environment environment) {
+        graph.getGraph().forEach((n, a) -> {
+            n.render(batch, environment);
+        });
     }
 
     public DirectedGraph getGraph() {

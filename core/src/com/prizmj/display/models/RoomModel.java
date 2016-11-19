@@ -9,48 +9,46 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
-import com.prizmj.display.parts.Room;
+import com.prizmj.display.parts.abstracts.Room;
 
 /**
  * com.prizmj.display.models in PrizmJ
  */
 public class RoomModel {
 
-    private Model model;
-    private ModelInstance instance;
+    private Model model_2d;
+    private Model model_3d;
+    private ModelInstance instance_2d;
+    private ModelInstance instance_3d;
     private Room room;
 
-    private int dimension;
-    private boolean toggle = true;
+    private Dimension view = Dimension.Environment_3D;
 
     private Array<Door> doors;
 
-    public RoomModel(Room room, ModelBuilder builder, int dimension) {
+    public RoomModel(Room room, ModelBuilder builder) {
         this.room = room;
-        this.dimension = dimension;
         this.doors = new Array<>();
-        if(dimension == 2)
-            create2DRoom(builder);
-        else
-            create3DRoom(builder);
+        create2DRoom(builder);
+        create3DRoom(builder);
     }
 
-    public RoomModel(Room room, ModelBuilder builder, int dimension, Door... doors) {
+    public RoomModel(Room room, ModelBuilder builder, Door... doors) {
         this.room = room;
-        this.dimension = dimension;
         this.doors = new Array<>();
-        if(dimension == 2)
-            create2DRoom(builder);
-        else
-            create3DRoom(builder, doors);
+        create2DRoom(builder);
+        create3DRoom(builder, doors);
     }
 
     public void render(ModelBatch modelBatch, Environment environment) {
-        if(toggle) modelBatch.render(instance, environment);
+        if(view == Dimension.Environment_3D)
+            modelBatch.render(instance_3d, environment);
+        else
+            modelBatch.render(instance_2d, environment);
     }
 
     public void create2DRoom(ModelBuilder builder) {
@@ -58,8 +56,8 @@ public class RoomModel {
         builder.node();
         MeshPartBuilder mpb = builder.part("basic_room", GL20.GL_TRIANGLES, VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position, new Material(ColorAttribute.createDiffuse(room.getFloorColor())));
         BoxShapeBuilder.build(mpb, room.getWidth(), 0.001f, room.getHeight());
-        model = builder.end();
-        instance = new ModelInstance(model, room.getX(), room.getY(), room.getZ());
+        model_2d = builder.end();
+        instance_2d = new ModelInstance(model_2d, room.getX(), room.getY(), room.getZ());
     }
 
     public void create3DRoom(ModelBuilder builder, Door... doors) {
@@ -92,12 +90,12 @@ public class RoomModel {
         }
         if(doors.length > 0)
             for(Door door : doors) createDoor(builder, door);
-        model = builder.end();
-        instance = new ModelInstance(model);
-        Node node = model.nodes.first();
+        model_3d = builder.end();
+        instance_3d = new ModelInstance(model_3d);
+        Node node = model_3d.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
-        instance.transform.set(node.globalTransform);
-        instance.calculateTransforms();
+        instance_3d.transform.set(node.globalTransform);
+        instance_3d.calculateTransforms();
     }
 
     private void createDoor(ModelBuilder builder, Door door) {
@@ -109,13 +107,13 @@ public class RoomModel {
         float z = 0;
         switch(side) {
             case 1: // Height case
-                x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
+                x = MathUtils.random((-room.getHeight() / 2) + (PrizmJ.DOOR_WIDTH / 2), (room.getHeight() / 2) - (PrizmJ.DOOR_HEIGHT / 2));
                 y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
                 z = ((room.getHeight() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
-                // Wall 1 - Even
+                // Wall 1
                 BoxShapeBuilder.build(mpb,
                         x, y, z,
-                        PrizmJ.DOOR_DEPTH,
+                        PrizmJ.DOOR_WIDTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
@@ -124,10 +122,10 @@ public class RoomModel {
                 x = MathUtils.random(-room.getHeight() / 2, room.getHeight() / 2);
                 y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
                 z = ((-room.getHeight() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
-                // Wall 2 - Even
+                // Wall 2
                 BoxShapeBuilder.build(mpb,
                         x, y, z,
-                        PrizmJ.DOOR_DEPTH,
+                        PrizmJ.DOOR_WIDTH,
                         PrizmJ.DOOR_HEIGHT,
                         PrizmJ.WALL_THICKNESS + 0.25f
                 );
@@ -136,36 +134,57 @@ public class RoomModel {
                 x = ((-room.getWidth() / 2) + PrizmJ.WALL_THICKNESS) - PrizmJ.WALL_OFFSET;
                 y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
                 z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
-                // Wall 3 - Even
+                // Wall 3
                 BoxShapeBuilder.build(mpb,
                         x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
-                        PrizmJ.DOOR_DEPTH
+                        PrizmJ.DOOR_WIDTH
                 );
                 break;
             case 4: // Width case
                 x = ((room.getWidth() / 2) - PrizmJ.WALL_THICKNESS) + PrizmJ.WALL_OFFSET;
                 y = (PrizmJ.WALL_HEIGHT / 2) - (PrizmJ.DOOR_HEIGHT / 2);
                 z = MathUtils.random(-room.getWidth() / 2, room.getWidth() / 2);
-                // Wall 4 - Even
+                // Wall 4
                 BoxShapeBuilder.build(mpb,
                         x, y, z,
                         PrizmJ.WALL_THICKNESS + 0.25f,
                         PrizmJ.DOOR_HEIGHT,
-                        PrizmJ.DOOR_DEPTH
+                        PrizmJ.DOOR_WIDTH
                 );
                 break;
         }
         door.updatePosition(x, y, z);
-        doors.add(door);
     }
 
     public void moveTo(float x, float y, float z) {
+        Node node = null;
         room.updatePosition(x, y, z);
-        Node node = model.nodes.first();
+        // Move 3d model first //
+        node = model_3d.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
-        instance.transform.set(node.globalTransform);
+        instance_3d.transform.set(node.globalTransform);
+        // Then move 2d model
+        node = model_2d.nodes.first();
+        node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
+        instance_2d.transform.set(node.globalTransform);
+    }
+
+    public void recreateRoom(ModelBuilder builder, Door... doors) {
+        create2DRoom(builder);
+        create3DRoom(builder, doors);
+    }
+
+    public void recreateRoomByAttachment(ModelBuilder builder, RoomModel attachingRoom, Door... allDoors) {
+        create2DRoom(builder);
+        create3DRoom(builder, allDoors);
+        if(allDoors != null && allDoors.length > 0) for (Door door : allDoors) {
+            door.setConnectedRoom(attachingRoom);
+            door.setInitialRoom(this);
+            attachingRoom.getDoors().add(door);
+            doors.add(door);
+        }
     }
 
     public Array<Door> getDoors() {
@@ -176,15 +195,11 @@ public class RoomModel {
         return room;
     }
 
-    public int getDimension() {
-        return dimension;
+    public void setDimensionView(Dimension dimensionView) {
+        this.view = dimensionView;
     }
 
-    public void setVisibility(boolean visible) {
-        this.toggle = visible;
-    }
-
-    public boolean isVisible() {
-        return toggle;
+    public Dimension getDimensionView() {
+        return view;
     }
 }

@@ -1,14 +1,15 @@
 package com.prizmj.display.parts;
 
 import com.badlogic.gdx.graphics.Color;
+import com.prizmj.display.parts.abstracts.Room;
 
 /**
  * com.prizmj.display.buildingparts.BasicRoom in PrizmJ
  */
-public class Stairway extends Room {
+public class Stairwell extends Room {
 
-    private Stairway downstairs;
-    private Stairway upstairs;
+    private String downstairs;
+    private String upstairs;
 
     /**
      * 2d Representation of Room
@@ -23,23 +24,23 @@ public class Stairway extends Room {
      * @param height - The height of the room. (approx.)
      * @param floorColor - The color the floor of the room.
      */
-    public Stairway(String name, float x, float y, float z, float width, float height, Color floorColor) {
+    public Stairwell(String name, float x, float y, float z, float width, float height, Color floorColor) {
         super(name, x, y, z, width, height, floorColor);
     }
 
-    public Stairway getDownstairs() {
+    public String getDownstairs() {
         return downstairs;
     }
 
-    public void setDownstairs(Stairway downstairs) {
+    public void setDownstairs(String downstairs) {
         this.downstairs = downstairs;
     }
 
-    public Stairway getUpstairs() {
+    public String getUpstairs() {
         return upstairs;
     }
 
-    public void setUpstairs(Stairway upstairs) {
+    public void setUpstairs(String upstairs) {
         this.upstairs = upstairs;
     }
 }

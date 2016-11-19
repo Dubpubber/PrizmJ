@@ -1,6 +1,11 @@
 package com.prizmj.display.simulation.components;
 
-import com.prizmj.display.parts.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.prizmj.display.PrizmJ;
+import com.prizmj.display.parts.abstracts.Room;
 
 import java.util.UUID;
 
@@ -22,13 +27,20 @@ public class Node {
 
     private Room room;
 
-    public Node(float xCen, float yCen, float floor, Room rm) {
-        x = xCen;
-        y = yCen;
-        z = floor;
+    private Model model;
+    private ModelInstance modelInstance;
+
+    public Node(float xCen, float yCen, float z, Room rm) {
+        this.x = xCen;
+        this.y = yCen;
+        this.z = z;
         room = rm;
         smokeDensity = 0.0f;
         walkingSpeed = 1.5f;
+    }
+
+    public void render(ModelBatch batch, Environment environment) {
+        batch.render(modelInstance, environment);
     }
 
     public UUID getId() {
@@ -85,5 +97,22 @@ public class Node {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+        setModelInstance(new ModelInstance(model));
+    }
+
+    public ModelInstance getModelInstance() {
+        return modelInstance;
+    }
+
+    public void setModelInstance(ModelInstance modelInstance) {
+        this.modelInstance = modelInstance;
     }
 }

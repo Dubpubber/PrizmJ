@@ -1,6 +1,9 @@
-package com.prizmj.display.simulation.components;
+package com.prizmj.display.simulation;
 
-import java.util.ArrayList;
+import com.badlogic.gdx.utils.Array;
+import com.prizmj.display.simulation.components.Edge;
+import com.prizmj.display.simulation.components.Node;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -12,7 +15,7 @@ public class DirectedGraph {
 
     // Map of Nodes to outgoing Edges. Each set of edges is stored
     // in an array list.
-    private final Map<Node, ArrayList<Edge>> graph = new HashMap<>();
+    private final Map<Node, Array<Edge>> graph = new HashMap<>();
 
     /**
      * Adds a node to the graph. Does nothing if it is already added.
@@ -27,7 +30,7 @@ public class DirectedGraph {
             return false;
 
         // Add the node to the graph with an empty set of edges.
-        graph.put(node, new ArrayList<Edge>());
+        graph.put(node, new Array<>());
         return true;
     }
 
@@ -59,7 +62,7 @@ public class DirectedGraph {
             throw new NoSuchElementException("Both nodes must exist in the graph.");
 
         // Remove the edge
-        graph.get(edge.getStart()).remove(edge);
+        graph.get(edge.getStart()).removeValue(edge, false);
     }
 
     /**
@@ -79,8 +82,13 @@ public class DirectedGraph {
             // If the edge connects to end node
             if (edge.getEnd().equals(end))
                 // Remove the edge
-                graph.get(start).remove(edge);
+                graph.get(start).removeValue(edge, false);
         });
 
     }
+
+    public Map<Node, Array<Edge>> getGraph() {
+        return graph;
+    }
+
 }

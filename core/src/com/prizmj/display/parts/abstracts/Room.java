@@ -1,4 +1,4 @@
-package com.prizmj.display.parts;
+package com.prizmj.display.parts.abstracts;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
@@ -12,11 +12,6 @@ public abstract class Room {
 
     private UUID id;
     private String name;
-
-    // TODO floor object
-    private float smokeDensity;
-    private float walkingSpeed;
-    private boolean isStairs = false;
 
     // For display purposes only //
     /*private Vector3 p1; // Bottom right (+, -)
@@ -68,22 +63,6 @@ public abstract class Room {
 
     public String getName() {
         return name;
-    }
-
-    public float getSmokeDensity() {
-        return smokeDensity;
-    }
-
-    public void setSmokeDensity(float smokeDensity) {
-        this.smokeDensity = smokeDensity;
-    }
-
-    public float getWalkingSpeed() {
-        return walkingSpeed;
-    }
-
-    public void setWalkingSpeed(float walkingSpeed) {
-        this.walkingSpeed = walkingSpeed;
     }
 
     public float getX() {

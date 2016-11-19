@@ -31,8 +31,8 @@ public class Door {
         this.side = side;
     }
 
-    public RoomModel getConnection1() {
-        return connection1;
+    public Door(Cardinal side) {
+        this.side = side.getSide();
     }
 
     public int getSide() {

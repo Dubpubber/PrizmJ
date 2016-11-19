@@ -38,14 +38,19 @@ public class PrizmJ extends ApplicationAdapter {
     private boolean DEBUG = true;
 
     public int currentDimension = 3;
+    private int floorplan = 1;
 
     public static final float WALL_HEIGHT = 2.5f;
     public static final float WALL_THICKNESS = 0.25f;
     public static final float WALL_OFFSET = 0.139f;
 
     public static final float DOOR_HEIGHT = 1.25f;
-    public static final Color DOOR_COLOR = Color.RED;
-    public static final float DOOR_DEPTH = 0.924f;
+    public static final float DOOR_WIDTH = 1f;
+    public static final Color DOOR_COLOR = Color.GOLD;
+
+    public static final float STAIRWELL_WIDTH = 4;
+    public static final float STAIRWELL_HEIGHT = 3;
+    public static final Color STAIRWELL_COLOR = Color.VIOLET;
 
     @Override
     public void create() {
@@ -60,35 +65,13 @@ public class PrizmJ extends ApplicationAdapter {
         this.environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-
         modelBuilder = new ModelBuilder();
-        Level floor = new Level(0);
-        Blueprint print = new Blueprint(this, floor);
-        Door door = new Door(3);
-        print.addRoomPairToSpecificFloor(0, "fagRoom", 0, 0, 0, 12, 7, Color.GREEN);
-        print.addRoomPairToSpecificFloor(0, "fagRoom2", 0, 0, 0, 6, 6, Color.GOLD, door);
-//        print.addRoomPairToSpecificFloor(0, "fagRoom3", 2, 0, 0, 4, 4, Color.GOLDENROD);
-//        print.addRoomPairToSpecificFloor(0, "fagRoom4", -2, 0, 0, 4, 4, Color.DARK_GRAY);
-//        print.addRoomPairToSpecificFloor(0, "fagRoom5", 0, 0, 0, 4, 4, Color.ROYAL);
-        print.updateModels();
-
-        // Using the method I suggested, was way faster
         try {
-            print.attachRoomByAxis("fagRoom", "fagRoom2", Cardinal.WEST);
-//            print.attachRoomByAxis("fagRoom", "fagRoom3", Cardinal.NORTH);
-//            print.attachRoomByAxis("fagRoom", "fagRoom4", Cardinal.NORTH);
-//            print.attachRoomByAxis("fagRoom2", "fagRoom5", Cardinal.NORTH);
+            createBuilding();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(print.getRoomModelByName("fagRoom2")/*.getDoors().first().getSecondRoom().getRoom().getName()*/  );
-//        try {
-//            print.attachRoomWithPrejudice("fagRoom", new String[] {"fagRoom3", "fagRoom4", "fagRoom5"}, Cardinal.WEST, Cardinal.WEST);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        this.manager = new RenderManager(this, print);
-        manager.switchDimension(currentDimension);
+        manager.switchDimension(Dimension.Environment_3D);
         if(DEBUG) {
             debugCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch = new SpriteBatch();
@@ -133,11 +116,19 @@ public class PrizmJ extends ApplicationAdapter {
             pCamera.position.set(10f, 10f, 10f);
         if(Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             if (currentDimension == 3) {
-                manager.switchDimension(2);
+                manager.switchDimension(Dimension.Environment_3D);
                 currentDimension = 2;
             } else {
-                manager.switchDimension(3);
+                manager.switchDimension(Dimension.Environment_2D);
                 currentDimension = 3;
+            }
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
+            floorplan++;
+            try {
+                createBuilding();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -171,6 +162,28 @@ public class PrizmJ extends ApplicationAdapter {
 
     public int getCurrentDimension() {
         return currentDimension;
+    }
+
+    public void createBuilding() throws Exception {
+        Level floor = new Level(0);
+        Blueprint print = new Blueprint(this, floor);
+        System.out.println(floorplan);
+        switch (floorplan) {
+            case 1:
+                print.addHallway(0, "hallway1", 0, 0, 0, 20, 4, Color.RED, true);
+                print.addRoomToSpecificFloor(0, "room1", 0, 0, 0, 5, 5, Color.BLUE);
+                print.updateModels();
+                print.attachRoomByAxis("hallway1", "room1", Cardinal.NORTH);
+                break;
+            default:
+                print.addHallway(0, "hallway1", 0, 0, 0, 20, 4, Color.BLUE, true);
+                print.addRoomToSpecificFloor(0, "room1", 0, 0, 0, 5, 5, Color.RED);
+                print.updateModels();
+                print.attachRoomByAxis("hallway1", "room1", Cardinal.NORTH);
+                floorplan = 0;
+                break;
+        }
+        this.manager = new RenderManager(this, print);
     }
 
 }
