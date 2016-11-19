@@ -178,5 +178,4 @@ public class PrizmJ extends ApplicationAdapter {
         print.createGraph();
         this.manager = new RenderManager(print);
     }
-
 }

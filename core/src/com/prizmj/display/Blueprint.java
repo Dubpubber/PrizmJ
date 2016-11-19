@@ -105,6 +105,7 @@ public class Blueprint {
                     break;
             }
             // #NeverForget the struggle with this and the eventual half-hour agree to disagree that ended up being my fault. //
+            // ufkinwotm8
             room2.recreateRoomByAttachment(prizmJ.getModelBuilder(), room1, new Door(Cardinal.getOpposite(cardinal)));
         } else throw new Exception("Can't attach a room to a nonexistent room.");
     }

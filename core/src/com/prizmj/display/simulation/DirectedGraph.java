@@ -17,6 +17,16 @@ public class DirectedGraph {
     // in an array list.
     private final Map<Vertex, Array<Edge>> graph = new HashMap<>();
 
+
+    public Array<Vertex> getVertices() {
+        Array<Vertex> vertices = new Array<>();
+        graph.keySet().forEach(vertex -> {
+            vertices.add(vertex);
+        });
+        return vertices;
+    }
+
+
     /**
      * Adds a node to the graph. Does nothing if it is already added.
      *

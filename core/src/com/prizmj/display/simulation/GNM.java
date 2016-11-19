@@ -15,6 +15,8 @@ import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
 
+import java.util.UUID;
+
 /**
  * Created by GrimmityGrammity on 11/16/2016.
  *
@@ -57,8 +59,8 @@ public class GNM {
             addVertex(new Vertex(center.x, PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom()));
             if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
                 // Your changes to snapping doors fucked shit up so make this work
-                addVertex(new Vertex(door.getX(), PrizmJ.WALL_HEIGHT / 2, door.getZ(), door.getFirstRoom().getRoom()));
-                System.out.println(door.toString());
+                // Your shitty recreate room fucked shit up fgt
+                addVertex(new Vertex(rm.getRoom().getX() + door.getX(), PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door.getFirstRoom().getRoom()));
             });
         });
     }
@@ -76,6 +78,7 @@ public class GNM {
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         ));
         vertex.updatePosition();
+        vertex.setId(UUID.randomUUID());
     }
 
     public void render(ModelBatch batch, Environment environment) {
