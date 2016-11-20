@@ -38,9 +38,16 @@ public class Hallway extends Room {
         super(name, x, y, z, width, height, floorColor);
         if(width == height) setWidth(width + 1);
         this.updown = updown;
+        vertices = new Array<>();
+        edges = new Array<>();
+    }
+
+    public void addEdge(Edge edge) {
+        edges.add(edge);
     }
 
     public void addVertex(Vertex vertex) {
+        System.out.println("Vertex:"+vertex.getRoom().getName());
         vertices.add(vertex);
         // North/South
         if (updown) {

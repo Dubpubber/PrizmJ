@@ -64,15 +64,39 @@ public class GNM {
         // Create vertices for each room and door
         // Connect rooms with their doors
         blueprint.getAllModels().forEach(rm -> {
+            // Create initial hallway
             if (rm.getRoom() instanceof Hallway) {
+                System.out.println("Hallway");
+                Vertex A, B;
+                // Create North/South vertices
                 if (((Hallway) rm.getRoom()).getUpDown()) {
-                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
-                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
-                    addVertex(north);
-                    addVertex(south);
-                    addEdge(new Edge(north, south));
-                    addEdge(new Edge(south, north));
+                    System.out.println("North/South");
+                    A = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    B = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
+                // Create East/West vertices
+                } else {
+                    System.out.println("East/West");
+                    A = new Vertex(rm.getRoom().getX() + (rm.getRoom().getWidth() / 2), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ(), rm.getRoom());
+                    B = new Vertex(rm.getRoom().getX() - (rm.getRoom().getWidth() / 2), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ(), rm.getRoom());
                 }
+                System.out.println("A:"+A);
+                System.out.println("B:"+B);
+                // Add vertices to hallway
+                ((Hallway) rm.getRoom()).addVertex(A);
+                ((Hallway) rm.getRoom()).addVertex(B);
+                // Add vertices to graph
+                addVertex(A);
+                addVertex(B);
+                // Create edges
+                Edge ab = new Edge(A, B); // North to south
+                Edge ba = new Edge(B, A); // South to north
+                // Add edges to hallway
+                ((Hallway) rm.getRoom()).addEdge(ab);
+                ((Hallway) rm.getRoom()).addEdge(ba);
+                // Add edges to graph
+                addEdge(ab);
+                addEdge(ba);
+            // Create rooms/stairs/doors
             } else {
                 Vector2 center = getCenter(rm.getRoom());
                 Vertex room = new Vertex(center.x, rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
@@ -107,17 +131,26 @@ public class GNM {
                     }
 
                     // Remove current edges
-                    graph.removeEdge(vertex, hallVertex);
-                    graph.removeEdge(hallVertex, vertex);
+                    hallway.getEdges().clear();
 
                     // Add vertex to hallway/model
                     addVertex(hallVertex);
                     hallway.addVertex(hallVertex);
+
+                    Edge A, B;
                     // Recreate edges in hallway
                     for (int i = 0; i < hallway.getVertices().size - 1; i++) {
-                        addEdge(new Edge(hallway.getVertices().get(i), hallway.getVertices().get(i+1)));
-                        addEdge(new Edge(hallway.getVertices().get(i+1), hallway.getVertices().get(i)));
+                        A = new Edge(hallway.getVertices().get(i), hallway.getVertices().get(i+1));
+                        B = new Edge(hallway.getVertices().get(i+1), hallway.getVertices().get(i));
+                        addEdge(A);
+                        addEdge(B);
+                        hallway.addEdge(A);
+                        hallway.addEdge(B);
                     }
+
+                    // Connect door with matching hallway vertex
+                    addEdge(new Edge(vertex, hallVertex));
+                    addEdge(new Edge(hallVertex, vertex));
                 }
             } else if (vertex.getRoom() instanceof Stairwell) {
                 if(((Stairwell) vertex.getRoom()).getDownstairs() != null){
