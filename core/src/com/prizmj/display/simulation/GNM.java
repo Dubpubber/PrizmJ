@@ -66,8 +66,8 @@ public class GNM {
         blueprint.getAllModels().forEach(rm -> {
             if (rm.getRoom() instanceof Hallway) {
                 if (((Hallway) rm.getRoom()).getUpDown()) {
-                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
-                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
                     addVertex(north);
                     addVertex(south);
                     addEdge(new Edge(north, south));
@@ -95,7 +95,29 @@ public class GNM {
                     addEdge(new Edge(graph.getVertexFromRoom(secondRoom), vertex));
                 // If the door connects to a hallway
                 } else {
-                    // To be implemented
+                    Hallway hallway = (Hallway)((Door) vertex.getRoom()).getSecondRoom().getRoom();
+                    Vertex hallVertex;
+                    // Create new hall vertex
+                    // North/South
+                    if (hallway.getUpDown()) {
+                        hallVertex = new Vertex(hallway.getX(), vertex.getY(), vertex.getZ(), ((Door) vertex.getRoom()).getSecondRoom().getRoom());
+                    // East/West
+                    } else {
+                        hallVertex = new Vertex(vertex.getX(), vertex.getY(), hallway.getZ(), ((Door) vertex.getRoom()).getSecondRoom().getRoom());
+                    }
+
+                    // Remove current edges
+                    graph.removeEdge(vertex, hallVertex);
+                    graph.removeEdge(hallVertex, vertex);
+
+                    // Add vertex to hallway/model
+                    addVertex(hallVertex);
+                    hallway.addVertex(hallVertex);
+                    // Recreate edges in hallway
+                    for (int i = 0; i < hallway.getVertices().size - 1; i++) {
+                        addEdge(new Edge(hallway.getVertices().get(i), hallway.getVertices().get(i+1)));
+                        addEdge(new Edge(hallway.getVertices().get(i+1), hallway.getVertices().get(i)));
+                    }
                 }
             } else if (vertex.getRoom() instanceof Stairwell) {
                 if(((Stairwell) vertex.getRoom()).getDownstairs() != null){
