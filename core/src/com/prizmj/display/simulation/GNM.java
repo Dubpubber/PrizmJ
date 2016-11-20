@@ -87,9 +87,9 @@ public class GNM {
                     // To be implemented
                 }
             } else if (vertex.getRoom() instanceof Stairwell) {
-                if(((Stairwell) vertex.getRoom()).getUpstairs() != null){
-                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getUpstairs()).getRoom())));
-                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getUpstairs()).getRoom())));
+                if(((Stairwell) vertex.getRoom()).getDownstairs() != null){
+                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getDownstairs()).getRoom())));
+                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getDownstairs()).getRoom())));
                 }
             }
         });
