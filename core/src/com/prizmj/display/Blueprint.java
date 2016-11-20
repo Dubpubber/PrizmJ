@@ -78,6 +78,7 @@ public class Blueprint {
     }
 
     /**
+     * This method assumes that the attaching room has already been translated.
      * *Without the door execution process*, this method is faster.
      * Note, to use this method, both rooms must already have been created.
      * @param existingRoom - The initial room.

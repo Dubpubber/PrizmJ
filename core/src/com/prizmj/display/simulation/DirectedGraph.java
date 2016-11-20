@@ -1,6 +1,7 @@
 package com.prizmj.display.simulation;
 
 import com.badlogic.gdx.utils.Array;
+import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
 
@@ -22,6 +23,18 @@ public class DirectedGraph {
         Array<Vertex> vertices = new Array<>();
         vertices.addAll(graph.keySet().toArray(new Vertex[graph.size()]));
         return vertices;
+    }
+
+    public Array<Edge> getEdgesFromVertex(Vertex vertex) {
+        return graph.get(vertex);
+    }
+
+    public Vertex getVertexFromRoom(Room room) {
+        final Vertex[] ret = {null};
+        graph.forEach((vertex, edges) -> {
+            if (vertex.getRoom().equals(room)) ret[0] = vertex;
+        });
+        return ret[0];
     }
 
     /**

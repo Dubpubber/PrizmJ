@@ -14,6 +14,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.Blueprint;
 import com.prizmj.display.PrizmJ;
+import com.prizmj.display.parts.Door;
+import com.prizmj.display.parts.Hallway;
+import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
@@ -58,31 +61,55 @@ public class GNM {
      * @param blueprint - The supplied blueprint to map into the DirectedGraph
      */
     public void compile(Blueprint blueprint) {
+        // Create vertices for each room and door
+        // Connect rooms with their doors
         blueprint.getAllModels().forEach(rm -> {
             Vector2 center = getCenter(rm.getRoom());
-            Vertex room = new Vertex(center.x, PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
+            Vertex room = new Vertex(center.x, rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
             addVertex(room);
             if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
-                Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door.getFirstRoom().getRoom());
+                Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door);
                 addVertex(vDoor);
                 addEdge((new Edge(room, vDoor)));
+                addEdge((new Edge(vDoor, room)));
             });
+        });
+        // Connect all doors with their secondRoom
+        graph.getVertices().forEach(vertex -> {
+            if (vertex.getRoom() instanceof Door) {
+                Room secondRoom = ((Door) vertex.getRoom()).getSecondRoom().getRoom();
+                // If the door connects to another room or stairs
+                if (!(secondRoom instanceof Hallway)) {
+                    addEdge(new Edge(vertex, graph.getVertexFromRoom(secondRoom)));
+                    addEdge(new Edge(graph.getVertexFromRoom(secondRoom), vertex));
+                // If the door connects to a hallway
+                } else {
+                    // To be implemented
+                }
+            } else if (vertex.getRoom() instanceof Stairwell) {
+                if(((Stairwell) vertex.getRoom()).getUpstairs() != null){
+                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getUpstairs()).getRoom())));
+                    addEdge(new Edge(vertex, graph.getVertexFromRoom(blueprint.getRoomModelByName(((Stairwell) vertex.getRoom()).getUpstairs()).getRoom())));
+                }
+            }
         });
     }
 
     private void addEdge(Edge edge) {
-        Model line;
+        if (!graph.getEdgesFromVertex(edge.getEnd()).contains(edge, false)) {
+            Model line;
+            modelBuilder.begin();
+            MeshPartBuilder builder = modelBuilder.part(
+                    "line",
+                    1,
+                    VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position,
+                    new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+            builder.line(edge.getStart().getX(), edge.getStart().getY(), edge.getStart().getZ(),
+                    edge.getEnd().getX(), edge.getEnd().getY(), edge.getEnd().getZ());
+            line = modelBuilder.end();
+            edge.setModel(line);
+        }
         graph.addEdge(edge);
-        modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part(
-                "line",
-                1,
-                VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position,
-                new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)));
-        builder.line(edge.getStart().getX(), edge.getStart().getY(), edge.getStart().getZ(),
-                     edge.getEnd().getX(), edge.getEnd().getY(), edge.getEnd().getZ());
-        line = modelBuilder.end();
-        edge.setModel(line);
     }
 
     private void addVertex(Vertex vertex) {
@@ -90,7 +117,7 @@ public class GNM {
         vertex.setModel(modelBuilder.createSphere(
                 1, 1, 1,
                 16, 16,
-                new Material(ColorAttribute.createDiffuse(Color.CYAN)),
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         ));
         vertex.updatePosition();
