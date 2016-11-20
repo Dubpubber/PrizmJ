@@ -28,6 +28,9 @@ public abstract class Room {
     private Color floorColor;
     // -- //
 
+    // For Doors
+    public Room(){}
+
     /**
      * 2d Representation of Room
      *

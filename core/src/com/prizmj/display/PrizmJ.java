@@ -164,9 +164,11 @@ public class PrizmJ extends ApplicationAdapter {
         try {
             switch (floorplan) {
                 case 1:
-                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.WHITE).moveTo(0, 0, 0);
-                    print.createAttachingRoom("FirstRoom", "SecondRoom", 10, 10, Color.RED, Cardinal.NORTH);
+                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.GRAY).moveTo(0, 0, 0);
+                    //print.createAttachingRoom("FirstRoom", "SecondRoom", 10, 10, Color.GRAY, Cardinal.NORTH);
                     print.createAttachingStairwell("FirstRoom", "Well1", Cardinal.EAST);
+                    print.createAttachingStairwell("Well1", "Well2");
+                    //print.createAttachingRoom("Well2", "ThirdRoom", 4, 4, Color.GRAY, Cardinal.WEST);
                     break;
                 default:
                     floorplan = 0;

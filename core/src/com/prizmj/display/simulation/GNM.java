@@ -64,15 +64,26 @@ public class GNM {
         // Create vertices for each room and door
         // Connect rooms with their doors
         blueprint.getAllModels().forEach(rm -> {
-            Vector2 center = getCenter(rm.getRoom());
-            Vertex room = new Vertex(center.x, rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
-            addVertex(room);
-            if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
-                Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door);
-                addVertex(vDoor);
-                addEdge((new Edge(room, vDoor)));
-                addEdge((new Edge(vDoor, room)));
-            });
+            if (rm.getRoom() instanceof Hallway) {
+                if (((Hallway) rm.getRoom()).getUpDown()) {
+                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    addVertex(north);
+                    addVertex(south);
+                    addEdge(new Edge(north, south));
+                    addEdge(new Edge(south, north));
+                }
+            } else {
+                Vector2 center = getCenter(rm.getRoom());
+                Vertex room = new Vertex(center.x, rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
+                addVertex(room);
+                if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
+                    Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door);
+                    addVertex(vDoor);
+                    addEdge((new Edge(room, vDoor)));
+                    addEdge((new Edge(vDoor, room)));
+                });
+            }
         });
         // Connect all doors with their secondRoom
         graph.getVertices().forEach(vertex -> {
