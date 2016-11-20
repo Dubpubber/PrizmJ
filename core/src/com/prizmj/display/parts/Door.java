@@ -4,13 +4,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.Cardinal;
 import com.prizmj.display.models.RoomModel;
+import com.prizmj.display.parts.abstracts.Room;
 
 import java.util.Vector;
 
 /**
  * com.prizmj.display.buildingparts.Door in PrizmJ
  */
-public class Door {
+public class Door extends Room{
 
     private RoomModel connection1;
     private RoomModel connection2;
