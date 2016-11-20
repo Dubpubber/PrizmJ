@@ -217,7 +217,8 @@ public class RoomModel {
         if(allDoors != null && allDoors.length > 0) for (Door door : allDoors) {
             door.setConnectedRoom(attachingRoom);
             door.setInitialRoom(this);
-            attachingRoom.getDoors().add(door);
+            // Your fault fag
+            //attachingRoom.getDoors().add(door);
             doors.add(door);
         }
     }

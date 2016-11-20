@@ -1,5 +1,10 @@
 package com.prizmj.display.simulation.components;
 
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+
 import java.util.UUID;
 
 /**
@@ -18,6 +23,24 @@ public class Edge {
     private float walkingSpeed;
     private float traversalTime;
 
+    private Model model;
+    private ModelInstance modelInstance;
+
+    public Edge (Vertex start, Vertex end) {
+        this.start = start;
+        this.end = end;
+        length = computeLength();
+        walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
+        traversalTime = (length / walkingSpeed);
+    }
+
+    private float computeLength() {
+        float len;
+        float x = start.getX() - end.getX();
+        float y = start.getY() - end.getY();
+        len = Math.abs((float)Math.sqrt((x * x) + (y * y)));
+        return len;
+    }
 
     public UUID getId() { return id; }
 
@@ -63,5 +86,22 @@ public class Edge {
 
     public void setTraversalTime(float traversalTime) {
         this.traversalTime = traversalTime;
+    }
+
+    public void render(ModelBatch batch, Environment environment) {
+        batch.render(modelInstance, environment);
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+        setModelInstance(new ModelInstance(model));
+    }
+
+    public ModelInstance getModelInstance() {
+        return modelInstance;
+    }
+
+    public void setModelInstance(ModelInstance modelInstance) {
+        this.modelInstance = modelInstance;
     }
 }

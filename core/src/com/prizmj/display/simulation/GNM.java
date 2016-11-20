@@ -1,9 +1,11 @@
 package com.prizmj.display.simulation;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
@@ -16,6 +18,7 @@ import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
 
+import javax.lang.model.type.PrimitiveType;
 import java.util.UUID;
 
 /**
@@ -57,17 +60,29 @@ public class GNM {
     public void compile(Blueprint blueprint) {
         blueprint.getAllModels().forEach(rm -> {
             Vector2 center = getCenter(rm.getRoom());
-            addVertex(new Vertex(center.x, PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom()));
+            Vertex room = new Vertex(center.x, PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
+            addVertex(room);
             if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
-                // Your changes to snapping doors fucked shit up so make this work
-                // Your shitty recreate room fucked shit up fgt
-                addVertex(new Vertex(rm.getRoom().getX() + door.getX(), PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door.getFirstRoom().getRoom()));
+                Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door.getFirstRoom().getRoom());
+                addVertex(vDoor);
+                addEdge((new Edge(room, vDoor)));
             });
         });
     }
 
     private void addEdge(Edge edge) {
+        Model line;
         graph.addEdge(edge);
+        modelBuilder.begin();
+        MeshPartBuilder builder = modelBuilder.part(
+                "line",
+                1,
+                VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position,
+                new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)));
+        builder.line(edge.getStart().getX(), edge.getStart().getY(), edge.getStart().getZ(),
+                     edge.getEnd().getX(), edge.getEnd().getY(), edge.getEnd().getZ());
+        line = modelBuilder.end();
+        edge.setModel(line);
     }
 
     private void addVertex(Vertex vertex) {
@@ -79,11 +94,13 @@ public class GNM {
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         ));
         vertex.updatePosition();
-        vertex.setId(UUID.randomUUID());
     }
 
     public void render(ModelBatch batch, Environment environment) {
-        graph.getGraph().forEach((n, a) -> n.render(batch, environment));
+        graph.getGraph().forEach((n, a) -> {
+            n.render(batch, environment);
+            a.forEach(edge -> edge.render(batch, environment));
+        });
     }
 
     public DirectedGraph getGraph() {
