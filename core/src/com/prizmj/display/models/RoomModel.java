@@ -173,23 +173,20 @@ public class RoomModel {
 
     public void createSmokeCube(ModelBuilder builder, float smokeDensity) {
         Material mat = new Material();
-        mat.set(ColorAttribute.createDiffuse(new Color(0.498f, 0.498f, 0.498f, 1)));
+        mat.set(ColorAttribute.createDiffuse(new Color(0.498f, 0.498f, 0.498f, smokeDensity)));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, smokeDensity));
         this.smokeCube = builder.createBox(
                 room.getWidth(),
                 PrizmJ.WALL_HEIGHT,
-                (room.getWidth() + room.getHeight()) / 2,
+                room.getHeight(),
                 mat,
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         );
         this.smokeCubeInstance = new ModelInstance(smokeCube);
-        Node node = smokeCube.nodes.first();
-        node.globalTransform.translate(room.getX(), room.getY() + (PrizmJ.WALL_HEIGHT / 2), room.getZ());
-        smokeCubeInstance.transform.set(node.globalTransform);
         this.smokeDensity = smokeDensity;
     }
 
-    public void moveTo(float x, float y, float z) {
+    public RoomModel moveTo(float x, float y, float z) {
         Node node = null;
         room.updatePosition(x, y, z);
         // Move 3d model first //
@@ -204,6 +201,8 @@ public class RoomModel {
         node = smokeCube.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
         smokeCubeInstance.transform.set(node.globalTransform);
+        System.out.println(room.toString());
+        return this;
     }
 
     public void recreateRoom(ModelBuilder builder, Door... doors) {
@@ -217,14 +216,16 @@ public class RoomModel {
         if(allDoors != null && allDoors.length > 0) for (Door door : allDoors) {
             door.setConnectedRoom(attachingRoom);
             door.setInitialRoom(this);
-            // Your fault fag
-            //attachingRoom.getDoors().add(door);
             doors.add(door);
         }
     }
 
     public void recreateSmokeCube(ModelBuilder builder, float smokeDensity) {
         createSmokeCube(builder, smokeDensity);
+        Node node = smokeCube.nodes.first();
+        node.globalTransform.translate(room.getX(), room.getY() + (PrizmJ.WALL_HEIGHT / 2), room.getZ());
+        smokeCubeInstance.transform.set(node.globalTransform);
+        System.out.println(room.toString());
     }
 
     public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed) {

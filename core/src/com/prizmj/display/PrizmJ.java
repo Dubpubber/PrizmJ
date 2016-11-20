@@ -45,7 +45,7 @@ public class PrizmJ extends ApplicationAdapter {
 
     public static final float STAIRWELL_WIDTH = 4;
     public static final float STAIRWELL_HEIGHT = 3;
-    public static final Color STAIRWELL_COLOR = Color.VIOLET;
+    public static final Color STAIRWELL_COLOR = Color.valueOf("C8D6A9");
 
     @Override
     public void create() {
@@ -164,9 +164,10 @@ public class PrizmJ extends ApplicationAdapter {
         try {
             switch (floorplan) {
                 case 1:
-                    print.createBasicRoom("FirstRoom", 0, 0, 0, 10, 10, Color.WHITE).moveTo(0, 0, 0);
-                    print.createAttachingRoom("FirstRoom", "SecondRoom", 10, 10, Color.RED, Cardinal.NORTH);
-                    print.createAttachingStairwell("FirstRoom", "Well1", Cardinal.EAST);
+                    print.createHallway("f1_hallway_1", 0, 0, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
+                    print.createAttachingStairwell("f1_hallway_1", "f1_stairwell_1", 0, 0, 8.5f, Cardinal.EAST);
+                    print.createAttachingRoom("f1_hallway_1", "f1_basicroom_1", 0, 0, 1, 10, 12, Color.valueOf("D6CAA9"), Cardinal.EAST);
+                    print.createAttachingRoom("f1_basicroom_1", "f1_basicroom_2", -9.05f - WALL_THICKNESS, 0, 20, 6, 3, Color.valueOf("C4703B"), Cardinal.NORTH);
                     break;
                 default:
                     floorplan = 0;
@@ -176,7 +177,7 @@ public class PrizmJ extends ApplicationAdapter {
             e.printStackTrace();
         }
         print.createGraph();
-        print.getRoomModelByName("FirstRoom").startSmokeSimulation(modelBuilder, 0.9f, 0.02f, 0.5f);
+        // print.getRoomModelByName("FirstRoom").startSmokeSimulation(modelBuilder, 0.9f, 0.02f, 0.5f);
         this.manager = new RenderManager(print);
     }
 }
