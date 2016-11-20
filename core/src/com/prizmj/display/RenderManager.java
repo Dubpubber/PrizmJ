@@ -28,11 +28,11 @@ public class RenderManager {
             blueprint.getGeometricNetworkModel().render(modelBatch, environment);
     }
 
-    public void setRooms(boolean rooms) {
-        this.rooms = rooms;
+    public void toggleRooms() {
+        this.rooms = !rooms;
     }
 
-    public void setGraph(boolean graph) {
-        this.graph = graph;
+    public void toggleGraph() {
+        this.graph = !graph;
     }
 }

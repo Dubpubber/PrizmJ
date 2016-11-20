@@ -9,6 +9,7 @@ import com.prizmj.display.parts.Hallway;
 import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.simulation.GNM;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 
@@ -38,39 +39,34 @@ public class Blueprint {
 
     public RoomModel createBasicRoom(String roomName, float x, float y, float z, float width, float height, Color roomColor) {
         RoomModel model = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder());
-        model.moveTo(x, y, z);
         return addRoomModelRenderQueue(model);
     }
 
     public RoomModel createAttachingRoom(String existingRoom, String roomName, float x, float y, float z, float width, float height, Color roomColor, Cardinal direction) throws Exception {
         RoomModel model = createBasicRoom(roomName, x, y, z, width, height, roomColor);
-        model.moveTo(x, y, z);
         attachRoomByAxis(existingRoom, roomName, direction);
         return model;
     }
 
     public RoomModel createHallway(String roomName, float x, float y, float z, float width, float height, Color roomColor, boolean updown) {
         RoomModel model = new RoomModel(new Hallway(roomName, x, y, z, width, height, roomColor, updown), prizmJ.getModelBuilder());
-        model.moveTo(x, y, z);
         return addRoomModelRenderQueue(model);
     }
 
+    @Deprecated
     public RoomModel createAttachingHallway(String existingRoom, String hallwayName, float x, float y, float z, float width, float height, Color hallwayColor, boolean updown, Cardinal direction) throws Exception {
         RoomModel model = createHallway(hallwayName, x, y, z, width, height, hallwayColor, updown);
-        model.moveTo(x, y, z);
         attachRoomByAxis(existingRoom, hallwayName, direction);
         return model;
     }
 
     public RoomModel createStairwell(String stairwayName, float x, float y, float z) {
         RoomModel model = new RoomModel(new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR), prizmJ.getModelBuilder());
-        model.moveTo(x, y, z);
         return addRoomModelRenderQueue(model);
     }
 
     public RoomModel createAttachingStairwell(String existingRoom, String hallwayName, float x, float y, float z, Cardinal direction) throws Exception {
         RoomModel model = createStairwell(hallwayName, x, y, z);
-        model.moveTo(x, y, z);
         attachRoomByAxis(existingRoom, hallwayName, direction);
         return model;
     }
@@ -78,7 +74,6 @@ public class Blueprint {
     public void createAttachingStairwell(String downstairs, String stairwayName, float x, float y, float z) {
         Stairwell well = new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR);
         RoomModel model = new RoomModel(well, prizmJ.getModelBuilder());
-        model.moveTo(x, y, z);
         addRoomModelRenderQueue(model);
         if(downstairs != null) {
             well.setDownstairs(downstairs);

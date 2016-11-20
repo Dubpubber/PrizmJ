@@ -66,8 +66,8 @@ public class GNM {
         blueprint.getAllModels().forEach(rm -> {
             if (rm.getRoom() instanceof Hallway) {
                 if (((Hallway) rm.getRoom()).getUpDown()) {
-                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
-                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY(), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    Vertex north = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
+                    Vertex south = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
                     addVertex(north);
                     addVertex(south);
                     addEdge(new Edge(north, south));

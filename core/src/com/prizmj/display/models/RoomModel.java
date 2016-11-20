@@ -205,12 +205,13 @@ public class RoomModel {
         return this;
     }
 
-    public void recreateRoom(ModelBuilder builder, Door... doors) {
+    public RoomModel recreateRoom(ModelBuilder builder, Door... doors) {
         create2DRoom(builder);
         create3DRoom(builder, doors);
+        return this;
     }
 
-    public void recreateRoomByAttachment(ModelBuilder builder, RoomModel attachingRoom, Door... allDoors) {
+    public RoomModel recreateRoomByAttachment(ModelBuilder builder, RoomModel attachingRoom, Door... allDoors) {
         create2DRoom(builder);
         create3DRoom(builder, allDoors);
         if(allDoors != null && allDoors.length > 0) for (Door door : allDoors) {
@@ -218,14 +219,15 @@ public class RoomModel {
             door.setInitialRoom(this);
             doors.add(door);
         }
+        return this;
     }
 
-    public void recreateSmokeCube(ModelBuilder builder, float smokeDensity) {
+    public RoomModel recreateSmokeCube(ModelBuilder builder, float smokeDensity) {
         createSmokeCube(builder, smokeDensity);
         Node node = smokeCube.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY() + (PrizmJ.WALL_HEIGHT / 2), room.getZ());
         smokeCubeInstance.transform.set(node.globalTransform);
-        System.out.println(room.toString());
+        return this;
     }
 
     public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed) {
