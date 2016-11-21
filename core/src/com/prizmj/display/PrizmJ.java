@@ -16,8 +16,8 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector;
-import com.badlogic.gdx.math.Vector3;
+import com.prizmj.display.models.RoomModel;
+import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.FireSimulator;
 
 public class PrizmJ extends ApplicationAdapter {
@@ -109,7 +109,7 @@ public class PrizmJ extends ApplicationAdapter {
             debugCam.update();
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+        /*if(Gdx.input.isKeyPressed(Input.Keys.A)) {
             Vector3 left = camController.camera.direction.cpy().crs(Vector3.Y).nor();
             camController.camera.position.add(left.scl(-camSpeed));
             camController.camera.update();
@@ -119,7 +119,8 @@ public class PrizmJ extends ApplicationAdapter {
             Vector3 right = camController.camera.direction.cpy().crs(Vector3.Y).nor();
             camController.camera.position.add(right.scl(camSpeed));
             camController.camera.update();
-        }
+        }*/
+
         if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
             camSpeed -= 0.25f;
         if(Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
@@ -188,10 +189,12 @@ public class PrizmJ extends ApplicationAdapter {
 
     public void createBuilding() throws Exception {
         Blueprint print = new Blueprint(this);
+        RoomModel hallway = null;
         try {
             switch (floorplan) {
                 case 1:
-                    print.createHallway("f1_hallway_1", 0, 0, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
+                    hallway = print.createHallway("f1_hallway_1", 0, 0, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
+
 //                    print.createHallway("f2_hallway_2", 0, PrizmJ.WALL_HEIGHT, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
 
                     print.createAttachingStairwell("f1_hallway_1", "f1_stairwell_1", 0, 0, 8.5f, Cardinal.EAST);

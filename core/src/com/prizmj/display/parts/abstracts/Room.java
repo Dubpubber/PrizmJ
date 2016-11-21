@@ -2,6 +2,7 @@ package com.prizmj.display.parts.abstracts;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
+import com.prizmj.display.Blueprint;
 
 import java.util.UUID;
 
@@ -12,12 +13,6 @@ public abstract class Room {
 
     private UUID id;
     private String name;
-
-    // For display purposes only //
-    /*private Vector3 p1; // Bottom right (+, -)
-    private Vector3 p2; // Bottom left (-, -)
-    private Vector3 p3; // Top right (-, +)
-    private Vector3 p4; // Top left (+, +)*/
 
     private float x;
     private float y;

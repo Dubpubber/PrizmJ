@@ -2,6 +2,7 @@ package com.prizmj.display;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import com.google.common.base.Stopwatch;
 import com.prizmj.display.models.RoomModel;
 import com.prizmj.display.parts.BasicRoom;
 import com.prizmj.display.parts.Door;
@@ -11,6 +12,8 @@ import com.prizmj.display.simulation.GNM;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -38,7 +41,7 @@ public class Blueprint {
     }
 
     public RoomModel createBasicRoom(String roomName, float x, float y, float z, float width, float height, Color roomColor) {
-        RoomModel model = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder());
+        RoomModel model = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder(), this);
         return addRoomModelRenderQueue(model);
     }
 
@@ -49,7 +52,7 @@ public class Blueprint {
     }
 
     public RoomModel createHallway(String roomName, float x, float y, float z, float width, float height, Color roomColor, boolean updown) {
-        RoomModel model = new RoomModel(new Hallway(roomName, x, y, z, width, height, roomColor, updown), prizmJ.getModelBuilder());
+        RoomModel model = new RoomModel(new Hallway(roomName, x, y, z, width, height, roomColor, updown), prizmJ.getModelBuilder(), this);
         return addRoomModelRenderQueue(model);
     }
 
@@ -61,7 +64,7 @@ public class Blueprint {
     }
 
     public RoomModel createStairwell(String stairwayName, float x, float y, float z) {
-        RoomModel model = new RoomModel(new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR), prizmJ.getModelBuilder());
+        RoomModel model = new RoomModel(new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR), prizmJ.getModelBuilder(), this);
         return addRoomModelRenderQueue(model);
     }
 
@@ -73,7 +76,7 @@ public class Blueprint {
 
     public void createAttachingStairwell(String downstairs, String stairwayName, float x, float y, float z) {
         Stairwell well = new Stairwell(stairwayName, x, y, z, PrizmJ.STAIRWELL_WIDTH, PrizmJ.STAIRWELL_HEIGHT, PrizmJ.STAIRWELL_COLOR);
-        RoomModel model = new RoomModel(well, prizmJ.getModelBuilder());
+        RoomModel model = new RoomModel(well, prizmJ.getModelBuilder(), this);
         addRoomModelRenderQueue(model);
         if(downstairs != null) {
             well.setDownstairs(downstairs);
@@ -130,7 +133,7 @@ public class Blueprint {
     public RoomModel getRoomModelByName(String name) {
         final RoomModel[] room = {null};
         models.forEach(roomModel -> {
-            if(roomModel.getRoom().getName().compareTo(name) == 0) room[0] = roomModel;
+            if (roomModel.getRoom().getName().compareTo(name) == 0) room[0] = roomModel;
         });
         return room[0];
     }
@@ -197,7 +200,7 @@ public class Blueprint {
 
     @Deprecated
     public void addRoomToSpecificFloor(int level, String roomName, float x, float y, float z, float width, float height, Color roomColor, Door... doors) {
-        RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder(), doors);
+        RoomModel roomModel = new RoomModel(new BasicRoom(roomName, x, y, z, width, height, roomColor), prizmJ.getModelBuilder(), this, doors);
         if(doors != null && doors.length > 0) for(Door door : doors) door.setInitialRoom(roomModel);
     }
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
+import com.prizmj.display.Blueprint;
 import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
@@ -41,8 +42,12 @@ public class RoomModel {
     private float smokeDensity = 0;
     private boolean simulationRunning = false;
 
-    public RoomModel(Room room, ModelBuilder builder) {
+    /* Blueprint object */
+    private Blueprint blueprint;
+
+    public RoomModel(Room room, ModelBuilder builder, Blueprint blueprint) {
         this.room = room;
+        this.blueprint = blueprint;
         room.setSmokeDensity(this.getSmokeDensity());
         this.doors = new Array<>();
         create2DRoom(builder);
@@ -50,8 +55,9 @@ public class RoomModel {
         createSmokeCube(builder, .5f);
     }
 
-    public RoomModel(Room room, ModelBuilder builder, Door... doors) {
+    public RoomModel(Room room, ModelBuilder builder, Blueprint blueprint, Door... doors) {
         this.room = room;
+        this.blueprint = blueprint;
         this.doors = new Array<>();
         create2DRoom(builder);
         create3DRoom(builder, doors);
