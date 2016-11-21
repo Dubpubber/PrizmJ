@@ -1,7 +1,12 @@
 package com.prizmj.display.parts;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.parts.abstracts.Room;
+import com.prizmj.display.simulation.components.Edge;
+import com.prizmj.display.simulation.components.Vertex;
+
+import java.util.Comparator;
 
 /**
  * com.prizmj.display.parts.Hallway in PrizmJ
@@ -12,6 +17,9 @@ public class Hallway extends Room {
     // False = East/West
     private boolean updown;
 
+    private Array<Vertex> vertices;
+
+    private Array<Edge> edges;
     /**
      * 2d Representation of Room
      * <p>
@@ -30,6 +38,48 @@ public class Hallway extends Room {
         super(name, x, y, z, width, height, floorColor);
         if(width == height) setWidth(width + 1);
         this.updown = updown;
+        vertices = new Array<>();
+        edges = new Array<>();
+    }
+
+    public void addEdge(Edge edge) {
+        edges.add(edge);
+    }
+
+    public void addVertex(Vertex vertex) {
+        System.out.println("Vertex:"+vertex.getRoom().getName());
+        vertices.add(vertex);
+        // North/South
+        if (updown) {
+            vertices.sort((v1, v2) -> {
+                if (v1.getRoom().getZ() < v2.getRoom().getZ()) {
+                    return -1;
+                } else if (v1.getRoom().getZ() > v2.getRoom().getZ()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        // East/West
+        } else {
+            vertices.sort((v1, v2) -> {
+                if (v1.getRoom().getX() < v2.getRoom().getX()) {
+                    return -1;
+                } else if (v1.getRoom().getX() > v2.getRoom().getX()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+    }
+
+    public Array<Vertex> getVertices() {
+        return vertices;
+    }
+
+    public Array<Edge> getEdges() {
+        return edges;
     }
 
     public boolean getUpDown() {
