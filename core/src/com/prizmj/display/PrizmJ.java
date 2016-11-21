@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector3;
+import com.prizmj.display.simulation.FireSimulator;
 
 public class PrizmJ extends ApplicationAdapter {
 
@@ -25,6 +26,8 @@ public class PrizmJ extends ApplicationAdapter {
 
     private PerspectiveCamera pCamera;
     private float camSpeed = 0.25f;
+
+    private FireSimulator fireSimulator;
 
     private ModelBuilder modelBuilder;
     private ModelBatch modelBatch;
@@ -145,6 +148,12 @@ public class PrizmJ extends ApplicationAdapter {
             manager.toggleGraph();
         }
 
+        if(Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            System.out.println("Running Simulator");
+            if (!fireSimulator.isSimulationRunning())
+                fireSimulator.simulateFire("f1_stairwell_1");
+        }
+
         camSpeed = MathUtils.clamp(camSpeed, 0, 5);
         if(Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             DEBUG = !DEBUG;
@@ -183,23 +192,24 @@ public class PrizmJ extends ApplicationAdapter {
             switch (floorplan) {
                 case 1:
                     print.createHallway("f1_hallway_1", 0, 0, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
-                    print.createHallway("f2_hallway_2", 0, PrizmJ.WALL_HEIGHT, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
+//                    print.createHallway("f2_hallway_2", 0, PrizmJ.WALL_HEIGHT, 0, 5, 20, Color.BROWN, true).recreateSmokeCube(modelBuilder, 0);
 
                     print.createAttachingStairwell("f1_hallway_1", "f1_stairwell_1", 0, 0, 8.5f, Cardinal.EAST);
                     print.createAttachingRoom("f1_hallway_1", "f1_basicroom_1", 0, 0, 1.20f, 10, 12, Color.valueOf("D6CAA9"), Cardinal.EAST);
+//                    print.createBasicRoom("f1_basicroom_1", -10, 0, 0, 10, 10, Color.CHARTREUSE);
                     print.createAttachingRoom("f1_basicroom_1", "f1_basicroom_2", -9.05f - WALL_THICKNESS, 0, 0, 6, 3, Color.valueOf("C4703B"), Cardinal.NORTH);
                     print.createAttachingRoom("f1_hallway_1", "f1_basicroom_3", 0, 0, 7.25f + WALL_THICKNESS, 5, 5, Color.GREEN, Cardinal.WEST);
-                    print.createAttachingRoom("f1_hallway_1", "f1_basicroom_3", 0, 0, 1.25f, 5, 8, Color.GREEN, Cardinal.WEST);
-                    print.createAttachingRoom("f1_hallway_1", "f1_basicroom_4", 0, 0, -6.25f, 5, 7.25f, Color.RED, Cardinal.WEST);
-
-                    print.createAttachingStairwell("f1_stairwell_1", "f2_stairwell_2", 0, 0, 0);
-                    print.attachRoomByAxis("f2_hallway_2", "f2_stairwell_2", Cardinal.EAST);
-
-                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_1", 0, PrizmJ.WALL_HEIGHT, 1.20f, 10, 12, Color.valueOf("D6CAA9"), Cardinal.EAST);
-                    print.createAttachingRoom("f2_basicroom_1", "f2_basicroom_2", -9.05f - WALL_THICKNESS, PrizmJ.WALL_HEIGHT, 0, 6, 3, Color.valueOf("C4703B"), Cardinal.NORTH);
-                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_3", 0, PrizmJ.WALL_HEIGHT, 7.25f + WALL_THICKNESS, 5, 5, Color.GREEN, Cardinal.WEST);
-                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_3", 0, PrizmJ.WALL_HEIGHT, 1.25f, 5, 8, Color.GREEN, Cardinal.WEST);
-                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_4", 0, PrizmJ.WALL_HEIGHT, -6.25f, 5, 7.25f, Color.RED, Cardinal.WEST);
+                    print.createAttachingRoom("f1_hallway_1", "f1_basicroom_4", 0, 0, 1.25f, 5, 8, Color.GREEN, Cardinal.WEST);
+                    print.createAttachingRoom("f1_hallway_1", "f1_basicroom_5", 0, 0, -6.25f, 5, 7.25f, Color.RED, Cardinal.WEST);
+//
+//                    print.createAttachingStairwell("f1_stairwell_1", "f2_stairwell_2", 0, 0, 0);
+//                    print.attachRoomByAxis("f2_hallway_2", "f2_stairwell_2", Cardinal.EAST);
+//
+//                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_1", 0, PrizmJ.WALL_HEIGHT, 1.20f, 10, 12, Color.valueOf("D6CAA9"), Cardinal.EAST);
+//                    print.createAttachingRoom("f2_basicroom_1", "f2_basicroom_2", -9.05f - WALL_THICKNESS, PrizmJ.WALL_HEIGHT, 0, 6, 3, Color.valueOf("C4703B"), Cardinal.NORTH);
+//                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_3", 0, PrizmJ.WALL_HEIGHT, 7.25f + WALL_THICKNESS, 5, 5, Color.GREEN, Cardinal.WEST);
+//                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_3", 0, PrizmJ.WALL_HEIGHT, 1.25f, 5, 8, Color.GREEN, Cardinal.WEST);
+//                    print.createAttachingRoom("f2_hallway_2", "f2_basicroom_4", 0, PrizmJ.WALL_HEIGHT, -6.25f, 5, 7.25f, Color.RED, Cardinal.WEST);
 
                     break;
                 default:
@@ -211,5 +221,6 @@ public class PrizmJ extends ApplicationAdapter {
         }
         print.createGraph();
         this.manager = new RenderManager(print);
+        this.fireSimulator = new FireSimulator(this, print);
     }
 }

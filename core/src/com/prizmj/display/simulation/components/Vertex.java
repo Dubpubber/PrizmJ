@@ -1,9 +1,11 @@
 package com.prizmj.display.simulation.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.parts.abstracts.Room;
@@ -19,6 +21,9 @@ public class Vertex {
 
     private UUID id;
 
+    private float weight;
+
+    private float sootDensity;
     private float smokeDensity;
     private float walkingSpeed;
 
@@ -36,12 +41,23 @@ public class Vertex {
         this.y = y;
         this.z = z;
         room = rm;
-        smokeDensity = 0.0f;
+        sootDensity = 0;
+        smokeDensity = 0;
         walkingSpeed = 1.5f;
+    }
+
+    public void update() {
+        smokeDensity = room.getSmokeDensity();
+        sootDensity = (float) (Math.log10(1 - smokeDensity) / 760000);
+        walkingSpeed = (float) Math.max(0.1f, ((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))));
     }
 
     public void render(ModelBatch batch, Environment environment) {
         batch.render(modelInstance, environment);
+    }
+
+    public void changeColor(Color color) {
+        modelInstance.materials.first().set(ColorAttribute.createDiffuse(color));
     }
 
     public void moveTo(float x, float y, float z) {
@@ -52,6 +68,14 @@ public class Vertex {
 
     public void updatePosition() {
         moveTo(x, y, z);
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 
     public UUID getId() {

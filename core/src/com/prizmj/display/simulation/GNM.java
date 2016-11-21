@@ -1,6 +1,5 @@
 package com.prizmj.display.simulation;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.Blueprint;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
@@ -20,9 +18,7 @@ import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
-
-import javax.lang.model.type.PrimitiveType;
-import java.util.UUID;
+import com.prizmj.display.simulation.dijkstra.DirectedGraph;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -58,29 +54,47 @@ public class GNM {
 
     /**
      * Compiles the edges and vertex' from the given blueprint.
+     *
+     * ForEach Room:
+     *      If Hallway:
+     *          Create vertices at ends of hallway
+     *          Attach with edge
+     *      Else:
+     *          Create a vertex
+     *          ForEach Door
+     *              Create a vertex
+     *              Attach door to room with edge
+     *
+     * ForEach vertex in the graph:
+     *      If Door:
+     *          Attach door to secondRoom by edge
+     *      If Hallway:
+     *          Compute location of new vertex
+     *          Clear hallway's edges
+     *          Insert new vertex into hallway
+     *          Reconstruct edges
+     *      Else if Stairs:
+     *          Attach upper stairwell with downstairs
+     *
      * @param blueprint - The supplied blueprint to map into the DirectedGraph
      */
     public void compile(Blueprint blueprint) {
         // Create vertices for each room and door
         // Connect rooms with their doors
         blueprint.getAllModels().forEach(rm -> {
+
             // Create initial hallway
             if (rm.getRoom() instanceof Hallway) {
-                System.out.println("Hallway");
                 Vertex A, B;
                 // Create North/South vertices
                 if (((Hallway) rm.getRoom()).getUpDown()) {
-                    System.out.println("North/South");
                     A = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() + (rm.getRoom().getHeight() / 2), rm.getRoom());
                     B = new Vertex(rm.getRoom().getX(), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ() - (rm.getRoom().getHeight() / 2), rm.getRoom());
                 // Create East/West vertices
                 } else {
-                    System.out.println("East/West");
                     A = new Vertex(rm.getRoom().getX() + (rm.getRoom().getWidth() / 2), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ(), rm.getRoom());
                     B = new Vertex(rm.getRoom().getX() - (rm.getRoom().getWidth() / 2), rm.getRoom().getY() + (PrizmJ.WALL_HEIGHT / 2), rm.getRoom().getZ(), rm.getRoom());
                 }
-                System.out.println("A:"+A);
-                System.out.println("B:"+B);
                 // Add vertices to hallway
                 ((Hallway) rm.getRoom()).addVertex(A);
                 ((Hallway) rm.getRoom()).addVertex(B);
@@ -96,29 +110,42 @@ public class GNM {
                 // Add edges to graph
                 addEdge(ab);
                 addEdge(ba);
+
             // Create rooms/stairs/doors
             } else {
+                // Create vertex for room
                 Vector2 center = getCenter(rm.getRoom());
                 Vertex room = new Vertex(center.x, rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, center.y, rm.getRoom());
                 addVertex(room);
+                // Create vertex for each door if needed, link door with room via edge
                 if(rm.getDoors().size > 0) rm.getDoors().forEach(door -> {
-                    Vertex vDoor = new Vertex(rm.getRoom().getX() + door.getX(), rm.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, rm.getRoom().getZ() + door.getZ(), door);
-                    addVertex(vDoor);
+                    Vertex vDoor;
+                    vDoor = graph.getVertexFromRoom(door);
+                    // If the vertex doesn't exist
+                    if(vDoor == null){
+                        // If the door belongs to this room, create it relative to our location
+                        if(door.getFirstRoom().getRoom().getName().compareTo(room.getRoom().getName()) == 0) {
+                            vDoor = new Vertex(room.getRoom().getX() + door.getX(), room.getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, room.getRoom().getZ() + door.getZ(), door);
+                        // Else the door belongs to another room, create it relative to that room
+                        } else {
+                            vDoor = new Vertex(door.getFirstRoom().getRoom().getX() + door.getX(), door.getFirstRoom().getRoom().getY() + PrizmJ.WALL_HEIGHT / 2, door.getFirstRoom().getRoom().getZ() + door.getZ(), door);
+                        }
+                        addVertex(vDoor);
+                    }
+                    // Link the door and this room
                     addEdge((new Edge(room, vDoor)));
                     addEdge((new Edge(vDoor, room)));
                 });
             }
         });
+
+
         // Connect all doors with their secondRoom
         graph.getVertices().forEach(vertex -> {
             if (vertex.getRoom() instanceof Door) {
                 Room secondRoom = ((Door) vertex.getRoom()).getSecondRoom().getRoom();
-                // If the door connects to another room or stairs
-                if (!(secondRoom instanceof Hallway)) {
-                    addEdge(new Edge(vertex, graph.getVertexFromRoom(secondRoom)));
-                    addEdge(new Edge(graph.getVertexFromRoom(secondRoom), vertex));
-                // If the door connects to a hallway
-                } else {
+                // If room is a hallway
+                if(secondRoom instanceof Hallway) {
                     Hallway hallway = (Hallway)((Door) vertex.getRoom()).getSecondRoom().getRoom();
                     Vertex hallVertex;
                     // Create new hall vertex
@@ -129,14 +156,11 @@ public class GNM {
                     } else {
                         hallVertex = new Vertex(vertex.getX(), vertex.getY(), hallway.getZ(), ((Door) vertex.getRoom()).getSecondRoom().getRoom());
                     }
-
                     // Remove current edges
                     hallway.getEdges().clear();
-
                     // Add vertex to hallway/model
                     addVertex(hallVertex);
                     hallway.addVertex(hallVertex);
-
                     Edge A, B;
                     // Recreate edges in hallway
                     for (int i = 0; i < hallway.getVertices().size - 1; i++) {
@@ -147,7 +171,6 @@ public class GNM {
                         hallway.addEdge(A);
                         hallway.addEdge(B);
                     }
-
                     // Connect door with matching hallway vertex
                     addEdge(new Edge(vertex, hallVertex));
                     addEdge(new Edge(hallVertex, vertex));
@@ -161,6 +184,11 @@ public class GNM {
         });
     }
 
+    /**
+     * Add edge into the graph.
+     * Constructs the model and line mesh part.
+     * @param edge
+     */
     private void addEdge(Edge edge) {
         if (!graph.getEdgesFromVertex(edge.getEnd()).contains(edge, false)) {
             Model line;
@@ -178,6 +206,11 @@ public class GNM {
         graph.addEdge(edge);
     }
 
+    /**
+     * Add vertex to the graph.
+     * Creates a sphere to represent the vertex.
+     * @param vertex
+     */
     private void addVertex(Vertex vertex) {
         graph.addVertex(vertex);
         vertex.setModel(modelBuilder.createSphere(
@@ -187,6 +220,15 @@ public class GNM {
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         ));
         vertex.updatePosition();
+    }
+
+    public void update() {
+        graph.getGraph().forEach((vertex, edges) -> {
+            vertex.update();
+            edges.forEach(edge -> {
+                edge.update();
+            });
+        });
     }
 
     public void render(ModelBatch batch, Environment environment) {
@@ -200,6 +242,7 @@ public class GNM {
         return graph;
     }
 
+    @Deprecated
     private float computeAreaPolygon(Room room) {
         float sum;
 
@@ -215,6 +258,13 @@ public class GNM {
         return sum;
     }
 
+    /**
+     * Compute the centroid of a polygon.
+     * Current doesn't work, maybe used in the future.
+     * @param room
+     * @return
+     */
+    @Deprecated
     private Vector2 computeCentroids(Room room) {
         float x , y;
         float area = computeAreaPolygon(room);

@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
+import com.prizmj.display.parts.Hallway;
 import com.prizmj.display.parts.abstracts.Room;
 
 /**
@@ -42,6 +43,7 @@ public class RoomModel {
 
     public RoomModel(Room room, ModelBuilder builder) {
         this.room = room;
+        room.setSmokeDensity(this.getSmokeDensity());
         this.doors = new Array<>();
         create2DRoom(builder);
         create3DRoom(builder);
@@ -217,6 +219,11 @@ public class RoomModel {
         if(allDoors != null && allDoors.length > 0) for (Door door : allDoors) {
             door.setConnectedRoom(attachingRoom);
             door.setInitialRoom(this);
+            // Add door to the hallway's own door array
+            if (attachingRoom.getRoom() instanceof Hallway) ((Hallway) attachingRoom.getRoom()).addDoor(door);
+            door.setName(getRoom().getName()+"_door_"+getRoom().getDoorCount());
+            getRoom().setDoorCount(getRoom().getDoorCount() + 1);
+            attachingRoom.doors.add(door);
             doors.add(door);
         }
         return this;
@@ -231,18 +238,50 @@ public class RoomModel {
     }
 
     public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed) {
-        this.simulationRunning = true;
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
-                if(getSmokeDensity() > apexPoint) {
-                    simulationRunning = false;
-                    System.out.println("Finished simulating smoke.");
-                    cancel();
+        if(this.simulationRunning == false) {
+            this.simulationRunning = true;
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
+                    room.setSmokeDensity(getSmokeDensity());
+                    System.out.println("Smoke Density "+getRoom().getName()+": "+getSmokeDensity());
+                    if(getSmokeDensity() > 0.5f){
+                        // For hallways
+                        if (getRoom() instanceof Hallway) {
+                            ((Hallway) getRoom()).getHallwayDoors().forEach(door -> {
+                                if (door.getFirstRoom().getSmokeDensity() <= 0) {
+                                    System.out.println("Spreading to "+door.getFirstRoom().getRoom().getName());
+                                    door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                                    door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                                }
+                            });
+                            // For rooms/stairs
+                        } else {
+                            doors.forEach(door -> {
+                                if (door.getSecondRoom().getSmokeDensity() <= 0) {
+                                    System.out.println("Spreading second to "+door.getSecondRoom().getRoom().getName());
+                                    door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                                } else if (door.getFirstRoom().getSmokeDensity() <= 0) {
+                                    System.out.println("Spreading first to "+door.getFirstRoom().getRoom().getName());
+                                    door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                                }
+                            });
+                        }
+                    }
+                    if(getSmokeDensity() > apexPoint) {
+                        simulationRunning = false;
+                        System.out.println("Finished simulating smoke in "+getRoom().getName());
+                        cancel();
+                    }
                 }
-            }
-        }, 0, repeatSpeed);
+            }, 0, repeatSpeed);
+        }
+    }
+
+    public void changeColor(Color color) {
+        instance_2d.materials.first().set(ColorAttribute.createDiffuse(color));
+        instance_3d.materials.first().set(ColorAttribute.createDiffuse(color));
     }
 
     public Array<Door> getDoors() {
