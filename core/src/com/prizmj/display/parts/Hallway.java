@@ -18,8 +18,9 @@ public class Hallway extends Room {
     private boolean updown;
 
     private Array<Vertex> vertices;
-
     private Array<Edge> edges;
+    private Array<Door> hallwayDoors;
+
     /**
      * 2d Representation of Room
      * <p>
@@ -40,6 +41,11 @@ public class Hallway extends Room {
         this.updown = updown;
         vertices = new Array<>();
         edges = new Array<>();
+        hallwayDoors = new Array<>();
+    }
+
+    public void addDoor(Door door) {
+        hallwayDoors.add(door);
     }
 
     public void addEdge(Edge edge) {
@@ -72,6 +78,10 @@ public class Hallway extends Room {
                 }
             });
         }
+    }
+
+    public Array<Door> getHallwayDoors() {
+        return hallwayDoors;
     }
 
     public Array<Vertex> getVertices() {

@@ -1,9 +1,11 @@
 package com.prizmj.display.simulation.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 
 import java.util.UUID;
 
@@ -32,6 +34,15 @@ public class Edge {
         length = computeLength();
         walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
         traversalTime = (length / walkingSpeed);
+    }
+
+    public void update() {
+        walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
+        traversalTime = (length / walkingSpeed);
+    }
+
+    public void changeColor(Color color) {
+        modelInstance.materials.first().set(ColorAttribute.createDiffuse(color));
     }
 
     private float computeLength() {

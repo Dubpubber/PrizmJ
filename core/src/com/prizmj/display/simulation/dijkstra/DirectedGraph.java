@@ -1,4 +1,4 @@
-package com.prizmj.display.simulation;
+package com.prizmj.display.simulation.dijkstra;
 
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.parts.abstracts.Room;
@@ -35,6 +35,16 @@ public class DirectedGraph {
             if (vertex.getRoom().equals(room)) ret[0] = vertex;
         });
         return ret[0];
+    }
+
+    public Array<Edge> getEdges() {
+        Array<Edge> edges = new Array<>();
+        graph.values().forEach(subArray -> {
+            subArray.forEach(edge -> {
+                edges.add(edge);
+            });
+        });
+        return edges;
     }
 
     /**

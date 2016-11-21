@@ -25,6 +25,10 @@ public abstract class Room {
     private float width;
     private float height;
 
+    private int doorCount;
+
+    private float smokeDensity;
+
     private Color floorColor;
     // -- //
 
@@ -46,6 +50,8 @@ public abstract class Room {
         this.width = width;
         this.height = height;
         this.floorColor = floorColor;
+        this.smokeDensity = 0;
+        this.doorCount = 0;
     }
 
     public void updatePosition(Vector3 vector3) {
@@ -60,8 +66,28 @@ public abstract class Room {
         this.z = z;
     }
 
+    public int getDoorCount() {
+        return doorCount;
+    }
+
+    public void setDoorCount(int doorCount) {
+        this.doorCount = doorCount;
+    }
+
+    public float getSmokeDensity() {
+        return smokeDensity;
+    }
+
+    public void setSmokeDensity(float smokeDensity) {
+        this.smokeDensity = smokeDensity;
+    }
+
     public UUID getId() {
         return id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getName() {
