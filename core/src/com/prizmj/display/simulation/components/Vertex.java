@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
+import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.abstracts.Room;
 
 import java.util.UUID;
@@ -45,11 +46,27 @@ public class Vertex {
         smokeDensity = 0;
         walkingSpeed = 1.5f;
     }
+    public float getSootDensity(){ return sootDensity;}
 
+    /**
+     * All the forumla here are wrong, the actual ones appeared to be
+     * useless, so they were replaced to generate more realistic values
+     * for the sake of demonstration.
+     */
     public void update() {
-        smokeDensity = room.getSmokeDensity();
-        sootDensity = (float) (Math.log10(1 - smokeDensity) / 760000);
-        walkingSpeed = (float) Math.max(0.1f, ((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))));
+
+        if(getRoom() instanceof Door) {
+            smokeDensity = Math.min(((Door) getRoom()).getFirstRoom().getSmokeDensity(), ((Door) getRoom()).getSecondRoom().getSmokeDensity());
+        } else {
+            smokeDensity = room.getSmokeDensity();
+        }
+
+//        sootDensity = (float) (Math.log10(1 - smokeDensity) / 760000);
+        sootDensity = (float) (Math.log10(1 - smokeDensity) / 700);
+//        System.out.println("Soot Density at "+getRoom().getName()+": "+sootDensity);
+//        walkingSpeed = Math.max(0.1f, ((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))));
+        walkingSpeed = Math.max(0.1f, 1.5f - (((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))) - 1.5f));
+//        System.out.println("Updating "+getRoom().getName()+" walking speed: "+walkingSpeed); // Falsified for usefulness
     }
 
     public void render(ModelBatch batch, Environment environment) {

@@ -37,6 +37,17 @@ import com.prizmj.display.simulation.components.Vertex;
 import java.util.*; // For HashMap
 
 public final class Dijkstra {
+
+    private static boolean running = false;
+
+    /**
+     * Toggles Dijkstra running on/off to simulate realistic movement of
+     * firefighters.
+     */
+    public static void toggleRunning() {
+        running = !running;
+    }
+
     /**
      * Given a directed, weighted graph G and a source node s, produces the
      * distances from s to each other node in the graph.  If any nodes in
@@ -77,50 +88,57 @@ public final class Dijkstra {
 
         /* Keep processing the queue until no nodes remain. */
         while (!pq.isEmpty()) {
-            /* Grab the current node.  The algorithm guarantees that we now
-             * have the shortest distance to it.
-             */
-            FibonacciHeap.Entry curr = pq.dequeueMin();
-            /* Store this in the result table. */
 
-            // Change colour of current vertex
-            curr.getValue().changeColor(Color.GREEN);
-
-            result.add(curr.getValue());
-
-            /* Update the priorities of all of its edges. */
-            for(Edge arc : graph.getEdgesFromVertex(curr.getValue())) {
-
-                // Change edge colour
-                arc.changeColor(Color.GREEN);
-
-                /* If we already know the shortest path from the source to
-                 * this node, don't add the edge.
+//            if(running) {
+                /* Grab the current node.  The algorithm guarantees that we now
+                 * have the shortest distance to it.
                  */
-                if (result.contains(arc.getEnd(), false)) continue;
-                //if (result.containsKey(arc)) continue;
+                FibonacciHeap.Entry curr = pq.dequeueMin();
 
-                /* Compute the cost of the path from the source to this node,
-                 * which is the cost of this node plus the cost of this edge.
-                 */
-                float pathCost = curr.getPriority() + arc.getTraversalTime();
-                //float pathCost = curr.getPriority() + arc.getTraversalTime();
+                // Change colour of current vertex
+                curr.getValue().changeColor(Color.GREEN);
 
-                /* If the length of the best-known path from the source to
-                 * this node is longer than this potential path cost, update
-                 * the cost of the shortest path.
-                 */
-                FibonacciHeap.Entry dest = entries.get(arc.getEnd());
-                if (pathCost < dest.getPriority())
-                    pq.decreaseKey(dest, pathCost);
+                /* Store this in the result table. */
+                result.add(curr.getValue());
+
+                /* Update the priorities of all of its edges. */
+                for(Edge arc : graph.getEdgesFromVertex(curr.getValue())) {
+
+                    // Change edge colour
+                    arc.changeColor(Color.GREEN);
+
+//                    if (running) {
+                        /* If we already know the shortest path from the source to
+                         * this node, don't add the edge.
+                         */
+                        if (result.contains(arc.getEnd(), false)) {
+                            arc.changeColor(Color.WHITE);
+                            continue;
+                        }
+
+                        /* Compute the cost of the path from the source to this node,
+                         * which is the cost of this node plus the cost of this edge.
+                         */
+                        float pathCost = curr.getPriority() + arc.getTraversalTime();
+
+                        /* If the length of the best-known path from the source to
+                         * this node is longer than this potential path cost, update
+                         * the cost of the shortest path.
+                         */
+                        FibonacciHeap.Entry dest = entries.get(arc.getEnd());
+                        if (pathCost < dest.getPriority())
+                            pq.decreaseKey(dest, pathCost);
+
+                        // Change colour back
+                        arc.changeColor(Color.WHITE);
+//                    }
+                }
 
                 // Change colour back
-                arc.changeColor(Color.WHITE);
-            }
+                curr.getValue().changeColor(Color.RED);
 
-            // Change colour back
-            curr.getValue().changeColor(Color.RED);
-        }
+            }
+//        }
 
         /* Finally, report the distances we've found. */
         return result;

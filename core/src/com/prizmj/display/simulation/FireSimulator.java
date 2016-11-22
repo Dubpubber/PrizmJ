@@ -43,23 +43,31 @@ public class FireSimulator {
         RoomModel room = blueprint.getRoomModelByName(name);
         this.simulationRunning = true;
 
-        Array<Vertex> results = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
-
-        results.forEach(vertex -> {
-            System.out.println("Vertex: "+vertex.getRoom().getName()+" : "+vertex.getWeight());
-        });
+        room.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f, gnm);
         // Firefighters arrive and traverse graph
-//        Timer.schedule(new Timer.Task() {
-//           @Override
-//           public void run() {
-//                // Firefights
-//               gnm.update();
-//
-//           }
-//        }, 60000, 60.0f);
+        Timer.schedule(new Timer.Task() {
+           @Override
+           public void run() {
+//               // Toggle Firefighters on/off
+//               //Dijkstra.toggleRunning();
+//               // Update the graph based on the smoke density
+               gnm.update();
+
+                Array<Vertex> results = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+
+               results.forEach(vertex -> {
+                   System.out.println("Vertex: "+vertex.getRoom().getName()+" : "+vertex.getWeight());
+               });
+////               gnm.getGraph().getGraph().forEach(((vertex, edges) -> {
+////                   System.out.println("Vertex "+vertex.getRoom().getName()+" walking speed: "+vertex.getWalkingSpeed());
+////                   System.out.println("Vertex "+vertex.getRoom().getName()+" weight: "+vertex.getWeight());
+//               }));
+           }
+        }, 30, 0.6f,0);
+
+
 
         // Light the building on fire
-        //room.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
         //room.startSmokeSimulation(builder, .075f, 0.05f, 1);
 
 

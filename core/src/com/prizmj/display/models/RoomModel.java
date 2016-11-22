@@ -18,7 +18,9 @@ import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.Hallway;
+import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.parts.abstracts.Room;
+import com.prizmj.display.simulation.GNM;
 
 /**
  * com.prizmj.display.models in PrizmJ
@@ -243,36 +245,56 @@ public class RoomModel {
         return this;
     }
 
-    public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed) {
+    public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed, GNM gnm) {
         if(this.simulationRunning == false) {
             this.simulationRunning = true;
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-                    recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
-                    room.setSmokeDensity(getSmokeDensity());
-                    System.out.println("Smoke Density "+getRoom().getName()+": "+getSmokeDensity());
-                    if(getSmokeDensity() > 0.5f){
-                        // For hallways
-                        if (getRoom() instanceof Hallway) {
-                            ((Hallway) getRoom()).getHallwayDoors().forEach(door -> {
-                                if (door.getFirstRoom().getSmokeDensity() <= 0) {
-                                    System.out.println("Spreading to "+door.getFirstRoom().getRoom().getName());
-                                    door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
-                                    door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                    if (getSmokeDensity() < apexPoint){
+                        recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
+                        room.setSmokeDensity(getSmokeDensity());
+                        System.out.println("-------------------------------------------------");
+                        System.out.println("Smoke Density "+getRoom().getName()+": "+getSmokeDensity());
+                        System.out.println("Walking Speed "+getRoom().getName()+": "+gnm.getGraph().getVertexFromRoom(getRoom()).getWalkingSpeed());
+                        System.out.println("Soot Density "+getRoom().getName()+": "+gnm.getGraph().getVertexFromRoom(getRoom()).getSootDensity());
+
+
+                        if(getSmokeDensity() > 0.5f){
+                            // For hallways
+                            if (getRoom() instanceof Hallway) {
+                                ((Hallway) getRoom()).getHallwayDoors().forEach(door -> {
+                                    if (door.getFirstRoom().getSmokeDensity() <= 0) {
+                                        System.out.println("Spreading to "+door.getFirstRoom().getRoom().getName());
+                                        door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
+                                        door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
+                                    }
+                                });
+                                // For rooms/stairs
+                            } else {
+                                doors.forEach(door -> {
+                                    if (door.getSecondRoom().getSmokeDensity() <= 0) {
+                                        System.out.println("Spreading second to "+door.getSecondRoom().getRoom().getName());
+                                        door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
+                                    } else if (door.getFirstRoom().getSmokeDensity() <= 0) {
+                                        System.out.println("Spreading first to "+door.getFirstRoom().getRoom().getName());
+                                        door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
+                                    }
+                                });
+                            }
+                            // Spread the fire up/down stairs
+                            if (getRoom() instanceof Stairwell) {
+                                if(((Stairwell) getRoom()).getUpstairs() != null) {
+                                    RoomModel upstairs = blueprint.getRoomModelByName(((Stairwell) getRoom()).getUpstairs());
+                                    if (upstairs.getRoom().getSmokeDensity() <= 0)
+                                        upstairs.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
                                 }
-                            });
-                            // For rooms/stairs
-                        } else {
-                            doors.forEach(door -> {
-                                if (door.getSecondRoom().getSmokeDensity() <= 0) {
-                                    System.out.println("Spreading second to "+door.getSecondRoom().getRoom().getName());
-                                    door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
-                                } else if (door.getFirstRoom().getSmokeDensity() <= 0) {
-                                    System.out.println("Spreading first to "+door.getFirstRoom().getRoom().getName());
-                                    door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f);
+                                if(((Stairwell) getRoom()).getDownstairs() != null) {
+                                    RoomModel downstairs = blueprint.getRoomModelByName(((Stairwell) getRoom()).getDownstairs());
+                                    if (downstairs.getRoom().getSmokeDensity() <= 0)
+                                        downstairs.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
                                 }
-                            });
+                            }
                         }
                     }
                     if(getSmokeDensity() > apexPoint) {
@@ -280,6 +302,7 @@ public class RoomModel {
                         System.out.println("Finished simulating smoke in "+getRoom().getName());
                         cancel();
                     }
+                    gnm.update();
                 }
             }, 0, repeatSpeed);
         }

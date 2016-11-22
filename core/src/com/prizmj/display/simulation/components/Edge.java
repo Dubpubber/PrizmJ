@@ -39,6 +39,7 @@ public class Edge {
     public void update() {
         walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
         traversalTime = (length / walkingSpeed);
+        System.out.println("edge from "+getStart().getRoom().getName()+" to "+getEnd().getRoom().getName()+" with time: "+getTraversalTime());
     }
 
     public void changeColor(Color color) {

@@ -80,6 +80,7 @@ public class Blueprint {
         addRoomModelRenderQueue(model);
         if(downstairs != null) {
             well.setDownstairs(downstairs);
+            ((Stairwell)getRoomModelByName(downstairs).getRoom()).setUpstairs(well.getName());
             RoomModel well2 = getRoomModelByName(downstairs);
             model.moveTo(well2.getRoom().getX(), well2.getRoom().getY() + PrizmJ.WALL_HEIGHT, well2.getRoom().getZ());
         }
