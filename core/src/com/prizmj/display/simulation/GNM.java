@@ -161,14 +161,11 @@ public class GNM {
                     // Add vertex to hallway/model
                     addVertex(hallVertex);
                     hallway.addVertex(hallVertex);
-                    System.out.println("HallVertex "+hallVertex.getRoom().getName()+" walking speed: "+hallVertex.getWalkingSpeed());
                     Edge A, B;
                     // Recreate edges in hallway
                     for (int i = 0; i < hallway.getVertices().size - 1; i++) {
                         A = new Edge(hallway.getVertices().get(i), hallway.getVertices().get(i+1));
                         B = new Edge(hallway.getVertices().get(i+1), hallway.getVertices().get(i));
-                        System.out.println("edge from "+A.getStart().getRoom().getName()+" to "+A.getEnd().getRoom().getName()+" with time: "+A.getTraversalTime());
-                        System.out.println("edge from "+B.getStart().getRoom().getName()+" to "+B.getEnd().getRoom().getName()+" with time: "+B.getTraversalTime());
                         addEdge(A);
                         addEdge(B);
                         hallway.addEdge(A);
@@ -230,9 +227,7 @@ public class GNM {
         graph.getGraph().forEach((vertex, edges) -> {
             if(vertex.getRoom().getSmokeDensity() > 0)
                 vertex.update();
-            edges.forEach(edge -> {
-                edge.update();
-            });
+            edges.forEach(Edge::update);
         });
     }
 

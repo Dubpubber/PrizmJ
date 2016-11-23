@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.UUID;
 
@@ -29,17 +31,17 @@ public class Edge {
     private ModelInstance modelInstance;
 
     public Edge (Vertex start, Vertex end) {
+        this.id = UUID.randomUUID();
         this.start = start;
         this.end = end;
         length = computeLength();
-        walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
+        setWalkingSpeed(((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2));
         traversalTime = (length / walkingSpeed);
     }
 
     public void update() {
         walkingSpeed = ((start.getWalkingSpeed() + end.getWalkingSpeed()) / 2);
         traversalTime = (length / walkingSpeed);
-        System.out.println("edge from "+getStart().getRoom().getName()+" to "+getEnd().getRoom().getName()+" with time: "+getTraversalTime());
     }
 
     public void changeColor(Color color) {
@@ -47,11 +49,10 @@ public class Edge {
     }
 
     private float computeLength() {
-        float len;
-        float x = start.getX() - end.getX();
-        float y = start.getY() - end.getY();
-        len = Math.abs((float)Math.sqrt((x * x) + (y * y)));
-        return len;
+        Vector3 x = new Vector3(start.getX(), start.getY(), start.getZ());
+        Vector3 y = new Vector3(end.getX(), end.getZ(), end.getZ());
+        // len = Math.abs((float)Math.sqrt((x * x) + (y * y)));
+        return x.dst(y);
     }
 
     public UUID getId() { return id; }

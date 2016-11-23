@@ -53,7 +53,7 @@ public class FireSimulator {
 //               // Update the graph based on the smoke density
                gnm.update();
 
-                Array<Vertex> results = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+               Array<Vertex> results = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
 
                results.forEach(vertex -> {
                    System.out.println("Vertex: "+vertex.getRoom().getName()+" : "+vertex.getWeight());
