@@ -66,7 +66,7 @@ public class DirectedGraph {
 
     /**
      * Adds an edge to the graph. Does nothing if edge's start/end nodes
-     *  are not in the graph.
+     * are not in the graph.
      *
      * @param edge - The edge to add
      * @return
@@ -82,7 +82,7 @@ public class DirectedGraph {
 
     /**
      * Removes an edge from the graph. Does nothing if node's start/end nodes
-     *  are not in the graph.
+     * are not in the graph.
      *
      * @param edge - The edge to remove
      */
@@ -97,10 +97,10 @@ public class DirectedGraph {
 
     /**
      * Removes an edge from the graph. Does nothing if start/end nodes
-     *  are not in the graph.
+     * are not in the graph.
      *
      * @param start - Start node of edge to remove
-     * @param end - End node of edge to remove
+     * @param end   - End node of edge to remove
      */
     public void removeEdge(Vertex start, Vertex end) {
         // Ensure both nodes exist in the graph

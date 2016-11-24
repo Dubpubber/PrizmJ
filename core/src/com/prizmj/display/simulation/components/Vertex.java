@@ -54,19 +54,15 @@ public class Vertex {
      * for the sake of demonstration.
      */
     public void update() {
-
         if(getRoom() instanceof Door) {
-            smokeDensity = Math.min(((Door) getRoom()).getFirstRoom().getSmokeDensity(), ((Door) getRoom()).getSecondRoom().getSmokeDensity());
+            smokeDensity = Math.min(((Door) getRoom()).getFirstRoom().getRoom().getSmokeDensity(), ((Door) getRoom()).getSecondRoom().getRoom().getSmokeDensity());
         } else {
             smokeDensity = room.getSmokeDensity();
         }
-
 //        sootDensity = (float) (Math.log10(1 - smokeDensity) / 760000);
         sootDensity = (float) (Math.log10(1 - smokeDensity) / 700);
-//        System.out.println("Soot Density at "+getRoom().getName()+": "+sootDensity);
 //        walkingSpeed = Math.max(0.1f, ((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))));
         walkingSpeed = Math.max(0.1f, 1.5f - (((1.5f / 0.706f) * (0.706f + (-0.057f * (7600f * sootDensity)))) - 1.5f));
-//        System.out.println("Updating "+getRoom().getName()+" walking speed: "+walkingSpeed); // Falsified for usefulness
     }
 
     public void render(ModelBatch batch, Environment environment) {

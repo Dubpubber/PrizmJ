@@ -8,6 +8,7 @@ import com.prizmj.display.parts.BasicRoom;
 import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.Hallway;
 import com.prizmj.display.parts.Stairwell;
+import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.GNM;
 
 import java.util.Comparator;
@@ -139,6 +140,19 @@ public class Blueprint {
         return room[0];
     }
 
+    public RoomModel getRoomModelByName2(String name) {
+        for(int x = 0; x < models.size; x++) {
+            RoomModel model = models.get(x);
+            if(model.getRoom().getName().compareTo(name) == 0)
+                return model;
+        }
+        return null;
+    }
+
+    public RoomModel getRandomRoom() {
+        return models.random();
+    }
+
     /**
      * Should always be called last, after the building is created!
      */
@@ -148,6 +162,10 @@ public class Blueprint {
 
     public GNM getGeometricNetworkModel() {
         return geometricNetworkModel;
+    }
+
+    public void dispose() {
+        models.forEach(RoomModel::dispose);
     }
 
     @Deprecated

@@ -53,7 +53,6 @@ public class Hallway extends Room {
     }
 
     public void addVertex(Vertex vertex) {
-        System.out.println("Vertex:"+vertex.getRoom().getName());
         vertices.add(vertex);
         // North/South
         if (updown) {

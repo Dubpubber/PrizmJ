@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.Blueprint;
+import com.prizmj.display.PrizmJ;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.Hallway;
@@ -19,6 +21,9 @@ import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
 import com.prizmj.display.simulation.dijkstra.DirectedGraph;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by GrimmityGrammity on 11/16/2016.
@@ -229,6 +234,20 @@ public class GNM {
                 vertex.update();
             edges.forEach(Edge::update);
         });
+    }
+
+    public void update2() {
+        Map<Vertex, Array<Edge>> map = graph.getGraph();
+        Iterator i = map.entrySet().iterator();
+        while(i.hasNext()) {
+            Map.Entry set = (Map.Entry) i.next();
+            Vertex v = (Vertex) set.getKey();
+            Array<Edge> e = (Array<Edge>) set.getValue();
+            if(v.getRoom().getSmokeDensity() > 0)
+                v.update();
+            for(int x = 0; x < e.size; x++)
+                e.get(x).update();
+        }
     }
 
     public void render(ModelBatch batch, Environment environment) {

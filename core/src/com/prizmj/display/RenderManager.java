@@ -11,28 +11,59 @@ public class RenderManager {
     private boolean rooms = true;
     private boolean graph = true;
 
+    // Y value that inc/dec according to the Prizm.J Wall height. Any room with a Y value below this value will be rendered.
+    // Set to 0 to render all.
+    private float renderingDegree = 0;
+    private float renderPeak = PrizmJ.WALL_HEIGHT;
+
     private Blueprint blueprint;
 
-    public RenderManager(Blueprint blueprint) {
+    RenderManager(Blueprint blueprint) {
         this.blueprint = blueprint;
+        calculateRenderPeak();
     }
 
-    public void switchDimension(Dimension dimension) {
+    void switchDimension(Dimension dimension) {
         blueprint.getAllModels().forEach(model -> model.setDimensionView(dimension));
     }
 
-    public void render(ModelBatch modelBatch, Environment environment) {
-        if(rooms)
-            blueprint.getAllModels().forEach(model -> model.render(modelBatch, environment));
-        if(graph)
+    void render(ModelBatch modelBatch, Environment environment) {
+        if(rooms) {
+            blueprint.getAllModels().forEach(model -> {
+                if(model.getRoom().getY() <= renderingDegree || renderingDegree == -1)
+                    model.render(modelBatch, environment);
+            });
+        } if(graph)
             blueprint.getGeometricNetworkModel().render(modelBatch, environment);
     }
 
-    public void toggleRooms() {
+    void toggleRooms() {
         this.rooms = !rooms;
     }
 
-    public void toggleGraph() {
+    void toggleGraph() {
         this.graph = !graph;
+    }
+
+    void incrementHeightDegree() {
+        if(renderingDegree < renderPeak)
+            renderingDegree += PrizmJ.WALL_HEIGHT;
+    }
+
+    void decrementHeightDegree() {
+        if(renderingDegree > 0)
+            renderingDegree -= PrizmJ.WALL_HEIGHT;
+        else
+            renderingDegree = 0;
+    }
+
+    private void calculateRenderPeak() {
+        // Find the render peak or room with highest y value
+        blueprint.getAllModels().forEach(model -> {
+            if(model.getRoom().getY() > renderPeak) {
+                renderPeak += PrizmJ.WALL_HEIGHT;
+            }
+        });
+        this.renderingDegree = renderPeak;
     }
 }

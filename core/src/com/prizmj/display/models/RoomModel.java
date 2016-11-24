@@ -12,13 +12,11 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.Blueprint;
 import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.parts.Door;
 import com.prizmj.display.parts.Hallway;
-import com.prizmj.display.parts.Stairwell;
 import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.GNM;
 
@@ -38,11 +36,11 @@ public class RoomModel {
     private Array<Door> doors;
 
     /* Simulation objects */
+    private SimulationModel smodel;
     private Model smokeCube;
     private ModelInstance smokeCubeInstance;
-    private boolean showingSmoke = true;
-    private float smokeDensity = 0;
-    private boolean simulationRunning = false;
+
+    private boolean isSimulating = false;
 
     /* Blueprint object */
     private Blueprint blueprint;
@@ -50,7 +48,6 @@ public class RoomModel {
     public RoomModel(Room room, ModelBuilder builder, Blueprint blueprint) {
         this.room = room;
         this.blueprint = blueprint;
-        room.setSmokeDensity(this.getSmokeDensity());
         this.doors = new Array<>();
         create2DRoom(builder);
         create3DRoom(builder);
@@ -69,7 +66,7 @@ public class RoomModel {
     public void render(ModelBatch modelBatch, Environment environment) {
         if(view == Dimension.Environment_3D) {
             modelBatch.render(instance_3d, environment);
-            if(showingSmoke) modelBatch.render(smokeCubeInstance, environment);
+            if(smodel != null && smodel.isShowingSmoke()) modelBatch.render(smokeCubeInstance, environment);
         } else
             modelBatch.render(instance_2d, environment);
     }
@@ -193,7 +190,7 @@ public class RoomModel {
                 VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position
         );
         this.smokeCubeInstance = new ModelInstance(smokeCube);
-        this.smokeDensity = smokeDensity;
+        this.getRoom().setSmokeDensity(smokeDensity);
     }
 
     public RoomModel moveTo(float x, float y, float z) {
@@ -211,7 +208,6 @@ public class RoomModel {
         node = smokeCube.nodes.first();
         node.globalTransform.translate(room.getX(), room.getY(), room.getZ());
         smokeCubeInstance.transform.set(node.globalTransform);
-        System.out.println(room.toString());
         return this;
     }
 
@@ -245,69 +241,6 @@ public class RoomModel {
         return this;
     }
 
-    public void startSmokeSimulation(ModelBuilder builder, float apexPoint, float smokeSpeed, float repeatSpeed, GNM gnm) {
-        if(this.simulationRunning == false) {
-            this.simulationRunning = true;
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
-                    if (getSmokeDensity() < apexPoint){
-                        recreateSmokeCube(builder, getSmokeDensity() + smokeSpeed);
-                        room.setSmokeDensity(getSmokeDensity());
-                        System.out.println("-------------------------------------------------");
-                        System.out.println("Smoke Density "+getRoom().getName()+": "+getSmokeDensity());
-                        System.out.println("Walking Speed "+getRoom().getName()+": "+gnm.getGraph().getVertexFromRoom(getRoom()).getWalkingSpeed());
-                        System.out.println("Soot Density "+getRoom().getName()+": "+gnm.getGraph().getVertexFromRoom(getRoom()).getSootDensity());
-
-
-                        if(getSmokeDensity() > 0.5f){
-                            // For hallways
-                            if (getRoom() instanceof Hallway) {
-                                ((Hallway) getRoom()).getHallwayDoors().forEach(door -> {
-                                    if (door.getFirstRoom().getSmokeDensity() <= 0) {
-                                        System.out.println("Spreading to "+door.getFirstRoom().getRoom().getName());
-                                        door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                        door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                    }
-                                });
-                                // For rooms/stairs
-                            } else {
-                                doors.forEach(door -> {
-                                    if (door.getSecondRoom().getSmokeDensity() <= 0) {
-                                        System.out.println("Spreading second to "+door.getSecondRoom().getRoom().getName());
-                                        door.getSecondRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                    } else if (door.getFirstRoom().getSmokeDensity() <= 0) {
-                                        System.out.println("Spreading first to "+door.getFirstRoom().getRoom().getName());
-                                        door.getFirstRoom().startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                    }
-                                });
-                            }
-                            // Spread the fire up/down stairs
-                            if (getRoom() instanceof Stairwell) {
-                                if(((Stairwell) getRoom()).getUpstairs() != null) {
-                                    RoomModel upstairs = blueprint.getRoomModelByName(((Stairwell) getRoom()).getUpstairs());
-                                    if (upstairs.getRoom().getSmokeDensity() <= 0)
-                                        upstairs.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                }
-                                if(((Stairwell) getRoom()).getDownstairs() != null) {
-                                    RoomModel downstairs = blueprint.getRoomModelByName(((Stairwell) getRoom()).getDownstairs());
-                                    if (downstairs.getRoom().getSmokeDensity() <= 0)
-                                        downstairs.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f,gnm);
-                                }
-                            }
-                        }
-                    }
-                    if(getSmokeDensity() > apexPoint) {
-                        simulationRunning = false;
-                        System.out.println("Finished simulating smoke in "+getRoom().getName());
-                        cancel();
-                    }
-                    gnm.update();
-                }
-            }, 0, repeatSpeed);
-        }
-    }
-
     public void changeColor(Color color) {
         instance_2d.materials.first().set(ColorAttribute.createDiffuse(color));
         instance_3d.materials.first().set(ColorAttribute.createDiffuse(color));
@@ -329,19 +262,40 @@ public class RoomModel {
         return view;
     }
 
-    public float getSmokeDensity() {
-        return smokeDensity;
+    public Blueprint getBlueprint() {
+        return blueprint;
     }
 
-    public boolean isShowingSmoke() {
-        return showingSmoke;
+    public void stepSmokeSimulation(ModelBuilder builder, float step) {
+        if(isSimulating && smodel != null) smodel.stepSimulation(builder, step);
     }
 
-    public void setShowingSmoke(boolean showingSmoke) {
-        this.showingSmoke = showingSmoke;
+    public void startSmokeSimulation(ModelBuilder builder, float repeatSpeed) {
+        if(isSimulating && smodel != null) smodel.startSmokeSimulation(builder, repeatSpeed);
     }
 
-    public boolean isSimulationRunning() {
-        return simulationRunning;
+    public boolean isSimulating() {
+        return isSimulating;
     }
+
+    public RoomModel createSimulation(GNM gnm) {
+        isSimulating = true;
+        smodel = new SimulationModel(this, 0.8f, gnm);
+        System.out.println("System has begun smoke simulation in room: " + getRoom().getName() + ".");
+        return this;
+    }
+
+    public RoomModel createSimulation(float apexPoint, float smokeSpeed, GNM gnm) {
+        isSimulating = true;
+        smodel = new SimulationModel(this, apexPoint, smokeSpeed, gnm);
+        System.out.println("System has begun smoke simulation in room: " + getRoom().getName() + ".");
+        return this;
+    }
+
+    public void dispose() {
+        model_2d.dispose();
+        model_3d.dispose();
+        smokeCube.dispose();
+    }
+
 }

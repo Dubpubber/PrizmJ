@@ -54,7 +54,7 @@ public final class Dijkstra {
      * the graph are unreachable from s, they will be reported at distance
      * +infinity.
      *
-     * @param graph The graph upon which to run Dijkstra's algorithm.
+     * @param graph  The graph upon which to run Dijkstra's algorithm.
      * @param source The source node in the graph.
      * @return A map from nodes in the graph to their distances from the source.
      */
@@ -78,7 +78,7 @@ public final class Dijkstra {
         /* Add each node to the Fibonacci heap at distance +infinity since
          * initially all nodes are unreachable.
          */
-        for (Vertex node: graph.getVertices())
+        for (Vertex node : graph.getVertices())
             entries.put(node, pq.enqueue(node, Float.POSITIVE_INFINITY));
 
         /* Update the source so that it's at distance 0.0 from itself; after
@@ -93,58 +93,57 @@ public final class Dijkstra {
                 /* Grab the current node.  The algorithm guarantees that we now
                  * have the shortest distance to it.
                  */
-                FibonacciHeap.Entry curr = pq.dequeueMin();
+            FibonacciHeap.Entry curr = pq.dequeueMin();
 
-                // Change colour of current vertex
-                curr.getValue().changeColor(Color.GREEN);
+            // Change colour of current vertex
+            curr.getValue().changeColor(Color.GREEN);
 
-                /* Store this in the result table. */
-                result.add(curr.getValue());
+            /* Store this in the result table. */
+            result.add(curr.getValue());
 
                 /* Update the priorities of all of its edges. */
-                for(Edge arc : graph.getEdgesFromVertex(curr.getValue())) {
+            for (Edge arc : graph.getEdgesFromVertex(curr.getValue())) {
 
-                    // Change edge colour
-                    arc.changeColor(Color.GREEN);
+                // Change edge colour
+                arc.changeColor(Color.GREEN);
 
 //                    if (running) {
                         /* If we already know the shortest path from the source to
                          * this node, don't add the edge.
                          */
-                        if (result.contains(arc.getEnd(), false)) {
-                            arc.changeColor(Color.WHITE);
-                            continue;
-                        }
+                if (result.contains(arc.getEnd(), false)) {
+                    arc.changeColor(Color.WHITE);
+                    continue;
+                }
 
                         /* Compute the cost of the path from the source to this node,
                          * which is the cost of this node plus the cost of this edge.
                          */
-                        float pathCost = curr.getPriority() + arc.getTraversalTime();
+                float pathCost = curr.getPriority() + arc.getTraversalTime();
 
                         /* If the length of the best-known path from the source to
                          * this node is longer than this potential path cost, update
                          * the cost of the shortest path.
                          */
-                        FibonacciHeap.Entry dest = entries.get(arc.getEnd());
-                        if (pathCost < dest.getPriority())
-                            pq.decreaseKey(dest, pathCost);
-
-                        // Change colour back
-                        arc.changeColor(Color.WHITE);
-//                    }
-                }
+                FibonacciHeap.Entry dest = entries.get(arc.getEnd());
+                if (pathCost < dest.getPriority())
+                    pq.decreaseKey(dest, pathCost);
 
                 // Change colour back
-                curr.getValue().changeColor(Color.RED);
-
+                arc.changeColor(Color.WHITE);
+//                    }
             }
+
+            // Change colour back
+            curr.getValue().changeColor(Color.RED);
+
+        }
 //        }
 
         /* Finally, report the distances we've found. */
         return result;
     }
 }
-
 
 
 //package com.prizmj.display.simulation.dijkstra;

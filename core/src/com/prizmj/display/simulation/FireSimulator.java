@@ -1,12 +1,12 @@
 package com.prizmj.display.simulation;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.Blueprint;
 import com.prizmj.display.PrizmJ;
 import com.prizmj.display.models.RoomModel;
-import com.prizmj.display.parts.abstracts.Room;
 import com.prizmj.display.simulation.components.Edge;
 import com.prizmj.display.simulation.components.Vertex;
 import com.prizmj.display.simulation.dijkstra.Dijkstra;
@@ -30,6 +30,8 @@ public class FireSimulator {
 
     private boolean simulationRunning;
 
+    private Array<Vertex> latestResults;
+
     public FireSimulator(PrizmJ prizmJ, Blueprint bprint) {
         gnm = bprint.getGeometricNetworkModel();
         blueprint = bprint;
@@ -37,51 +39,78 @@ public class FireSimulator {
         simulationRunning = false;
     }
 
-    public void simulateFire(String name) {
-
-        ModelBuilder builder = prizmJ.getModelBuilder();
+    public void startFireSimulation(String name) {
         RoomModel room = blueprint.getRoomModelByName(name);
         this.simulationRunning = true;
-
-        room.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f, gnm);
+        PrizmJ.writeToConsole("Starting fire simulation with room: " + name + ".");
+        // room.startSmokeSimulation(builder, 0.85f, 0.0146f, 0.5f, gnm);
         // Firefighters arrive and traverse graph
         Timer.schedule(new Timer.Task() {
            @Override
            public void run() {
-//               // Toggle Firefighters on/off
-//               //Dijkstra.toggleRunning();
-//               // Update the graph based on the smoke density
                gnm.update();
-
-               Array<Vertex> results = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
-
-               results.forEach(vertex -> {
-                   System.out.println("Vertex: "+vertex.getRoom().getName()+" : "+vertex.getWeight());
-               });
-////               gnm.getGraph().getGraph().forEach(((vertex, edges) -> {
-////                   System.out.println("Vertex "+vertex.getRoom().getName()+" walking speed: "+vertex.getWalkingSpeed());
-////                   System.out.println("Vertex "+vertex.getRoom().getName()+" weight: "+vertex.getWeight());
-//               }));
+               latestResults = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
            }
-        }, 30, 0.6f,0);
+        }, 30, 0.6f, 0);
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                if(isEngulfed() && simulationRunning) {
+                    PrizmJ.writeToConsole("Entire building has been engulfed in flames.");
+                    simulationRunning = false;
+                }
+            }
+        }, 0, 1);
+        room.createSimulation(0.85f, 0.0146f, gnm).startSmokeSimulation(prizmJ.getModelBuilder(), 0.5f);
+    }
 
+    public void stepFireSimulation(float step) {
+        blueprint.getAllModels().forEach(rm -> rm.stepSmokeSimulation(prizmJ.getModelBuilder(), step));
+        Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+    }
 
-
-        // Light the building on fire
-        //room.startSmokeSimulation(builder, .075f, 0.05f, 1);
-
-
+    public boolean isEngulfed() {
+        for(RoomModel model : blueprint.getAllModels()) {
+            if(model.getRoom().getSmokeDensity() < 0.85f) return false;
+        }
+        return true;
     }
 
     public GNM getGNM() {
         return gnm;
     }
 
-    public void dijkstra() {
-
-    }
-
     public boolean isSimulationRunning() {
         return simulationRunning;
     }
+
+    public Array<Vertex> getLatestResults() {
+        if(latestResults != null)
+            return latestResults;
+        else
+            return Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+    }
+
+    public Array<Vertex> getLatestResultsFromRoom(String roomName) {
+        return Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName(roomName).getRoom()));
+    }
+
+    public void simulateDijkstraResults(Array<Vertex> dr) {
+        final int[] x = {0};
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                Vertex v = dr.get(x[0]);
+                v.changeColor(Color.GREEN);
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        v.changeColor(Color.RED);
+                    }
+                }, 0.5f);
+                x[0]++;
+            }
+        }, 0, 1f, dr.size - 1);
+    }
+
 }
