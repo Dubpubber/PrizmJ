@@ -49,7 +49,7 @@ public class FireSimulator {
            @Override
            public void run() {
                gnm.update();
-               latestResults = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+               latestResults = Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_1").getRoom()));
            }
         }, 30, 0.6f, 0);
         Timer.schedule(new Timer.Task() {
@@ -66,7 +66,7 @@ public class FireSimulator {
 
     public void stepFireSimulation(float step) {
         blueprint.getAllModels().forEach(rm -> rm.stepSmokeSimulation(prizmJ.getModelBuilder(), step));
-        Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+        Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_1").getRoom()));
     }
 
     public boolean isEngulfed() {
@@ -88,7 +88,7 @@ public class FireSimulator {
         if(latestResults != null)
             return latestResults;
         else
-            return Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_2").getRoom()));
+            return Dijkstra.shortestPaths(gnm.getGraph(), gnm.getGraph().getVertexFromRoom(blueprint.getRoomModelByName("f1_basicroom_1").getRoom()));
     }
 
     public Array<Vertex> getLatestResultsFromRoom(String roomName) {
