@@ -8,29 +8,38 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.prizmj.display;
+package com.prizmj.display.models;
+
+/*
+  com.prizmj.display.models.IModel in PrizmJPortable
+  Created by Tyler Crowe on 12/8/2016.
+  Website: https://loneboat.com
+  GitHub: https://github.com/Dubpubber
+  Machine Time: 4:51 AM
+ */
+
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
 /**
- * com.prizmj.display.Cardinal in PrizmJ
+ * IModel or obviously "Interface Model" exists so the render manager can access all models, regardless of type, and render them accordingly.
  */
-public enum Cardinal {
-    NORTH(1), SOUTH(2), EAST(3), WEST(4);
+public interface IModel {
 
-    final int side;
+    /**
+     * Gets the model's name.
+     * @return - The model's name, used for fetching from system manager.
+     */
+    String getModelName();
 
-    Cardinal(int side) {
-        this.side = side;
-    }
+    /**
+     * Render method that will be called on by the render manager according to libgdx's model batch.
+     * See PrizmJ main render method for more information.
+     */
+    void render(ModelBatch batch, Environment environment);
 
-    public int getSide() {
-        return side;
-    }
-
-    public static Cardinal getOpposite(Cardinal cardinal) {
-        if(cardinal == Cardinal.NORTH || cardinal == Cardinal.SOUTH)
-            return (cardinal == Cardinal.NORTH) ? Cardinal.SOUTH : Cardinal.NORTH;
-        else
-            return (cardinal == Cardinal.EAST) ? Cardinal.WEST : Cardinal.EAST;
-    }
-
+    /**
+     * Disposes of the Class:IModel object.
+     */
+    void dispose();
 }

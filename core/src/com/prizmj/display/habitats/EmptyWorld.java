@@ -8,29 +8,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.prizmj.display;
+package com.prizmj.display.habitats;
+
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.prizmj.display.models.IModel;
 
 /**
- * com.prizmj.display.Cardinal in PrizmJ
+ * com.prizmj.display.habitats.EmptyWorld in PrizmJPortable
+ * Created by Tyler Crowe on 12/8/2016.
+ * Website: https://loneboat.com
+ * GitHub: https://github.com/Dubpubber
+ * Machine Time: 4:49 AM
  */
-public enum Cardinal {
-    NORTH(1), SOUTH(2), EAST(3), WEST(4);
+public class EmptyWorld extends Habitat {
 
-    final int side;
-
-    Cardinal(int side) {
-        this.side = side;
-    }
-
-    public int getSide() {
-        return side;
-    }
-
-    public static Cardinal getOpposite(Cardinal cardinal) {
-        if(cardinal == Cardinal.NORTH || cardinal == Cardinal.SOUTH)
-            return (cardinal == Cardinal.NORTH) ? Cardinal.SOUTH : Cardinal.NORTH;
-        else
-            return (cardinal == Cardinal.EAST) ? Cardinal.WEST : Cardinal.EAST;
+    public EmptyWorld(String name, ModelBatch modelBatch, Environment environment, IModel... models) throws Exception {
+        super(name, modelBatch, environment, models);
     }
 
 }

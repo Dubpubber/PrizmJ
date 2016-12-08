@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016 Tyler Crowe
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package com.prizmj.console;
 
 import com.prizmj.display.PrizmJ;
@@ -75,50 +85,6 @@ public class CommandFactory {
 
     private void executeCommand() {
         switch (getCommand()) {
-            case "help":
-                PrizmJ.clearCommandText();
-                PrizmJ.writeToConsole("List of commands: [  ] = required (  ) = optional\n");
-                PrizmJ.console.append("\thelp: Displays this text.\n");
-                PrizmJ.console.append("\tchelp: Displays controls.\n");
-                PrizmJ.console.append("\tss [\"room_name\"]: Starts fire simulation in specified room.\n");
-                PrizmJ.console.append("\tgetallrooms: Prints the name of all rooms.\n");
-                PrizmJ.console.append("\tdijkstra (\"room_name\"): Prints dijkstra information.\n");
-                PrizmJ.clearCommandText();
-                break;
-            case "chelp":
-                PrizmJ.writeControlHelpToConsole();
-                PrizmJ.clearCommandText();
-                break;
-            case "ss":
-                if(prizmJ.getBlueprint().getRoomModelByName(getArgument(0)) == null) {
-                    PrizmJ.writeToConsole("No room found with the name: " + getArgument(0) + ". Try 'getallrooms' to get a list of all the current rooms.");
-                    break;
-                }
-                prizmJ.getFireSimulator().startFireSimulation(getArgument(0));
-                PrizmJ.clearCommandText();
-                break;
-            case "getAllRooms":
-            case "gar":
-            case "getallrooms":
-                prizmJ.getBlueprint().getAllModels().forEach(rm -> PrizmJ.writeToConsole(rm.getRoom().getName()));
-                PrizmJ.clearCommandText();
-                break;
-            case "dijkstra":
-            case "dstra":
-                if(args.length == 0) {
-                    PrizmJ.writeToConsole("For best possible Dijkstra results, run after or during simulation!");
-                    PrizmJ.writeToConsole("!- Begin Dijkstra Dump -!");
-                    prizmJ.getFireSimulator().getLatestResults().forEach(vertex -> PrizmJ.writeToConsole(String.format("Vertex: \"%s\", Vertex-Weight: (%f)", vertex.getRoom().getName(), vertex.getWeight())));
-                    prizmJ.getFireSimulator().simulateDijkstraResults(prizmJ.getFireSimulator().getLatestResults());
-                    PrizmJ.writeToConsole("!- End Dijkstra Dump -!");
-                } else {
-                    PrizmJ.writeToConsole("For best possible Dijkstra results, run after or during simulation!");
-                    PrizmJ.writeToConsole("!- Begin Dijkstra Dump -!");
-                    prizmJ.getFireSimulator().getLatestResultsFromRoom(getArgument(0)).forEach(vertex -> PrizmJ.writeToConsole(String.format("Vertex: \"%s\", Vertex-Weight: (%f)", vertex.getRoom().getName(), vertex.getWeight())));
-                    PrizmJ.writeToConsole("!- End Dijkstra Dump -!");
-                }
-                PrizmJ.clearCommandText();
-                break;
             default:
                 PrizmJ.writeToConsole("Unrecognized command: " + toString());
                 break;
