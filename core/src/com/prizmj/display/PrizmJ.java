@@ -28,6 +28,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.prizmj.console.CommandFactory;
 import com.prizmj.display.habitats.EmptyWorld;
 import com.prizmj.display.habitats.Habitat;
+import com.prizmj.display.models.generic.GenericSensorDropEnv;
 import com.prizmj.display.models.generic.GenericSphere;
 import com.prizmj.display.models.generic.profiles.SphereProfile;
 
@@ -90,9 +91,7 @@ public class PrizmJ extends ApplicationAdapter {
         commandFeedback = new CommandFactory(this);
 
         try {
-            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, new GenericSphere(this, "sphere_1", new SphereProfile(
-                    0, 0, 0, Color.CYAN, 2, 3, 2, 6, 6, 6, 6, 16, 16
-            )));
+            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, new GenericSensorDropEnv(this, "test_env"));
         } catch (Exception e) {
             e.printStackTrace();
         }
