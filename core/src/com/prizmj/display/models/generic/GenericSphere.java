@@ -42,7 +42,7 @@ public class GenericSphere extends GenericModel {
         create2DModel();
         create3DModel();
         // Honor profile //
-        updateColor(profile.getColor());
+        changeColor(profile.getColor());
         moveTo(profile.getPosition());
     }
 

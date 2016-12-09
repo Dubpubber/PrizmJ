@@ -10,6 +10,7 @@
 
 package com.prizmj.console;
 
+import com.badlogic.gdx.Gdx;
 import com.prizmj.display.PrizmJ;
 
 import java.awt.event.KeyAdapter;
@@ -84,11 +85,18 @@ public class CommandFactory {
     }
 
     private void executeCommand() {
-        switch (getCommand()) {
-            default:
-                PrizmJ.writeToConsole("Unrecognized command: " + toString());
-                break;
-        }
+        Gdx.app.postRunnable(() -> {
+            switch (getCommand()) {
+                /* ADD YOUR COMMANDS HERE LIKE SO:
+                case "mycommand":
+                    do.mything();
+                    break;
+                 */
+                default:
+                    PrizmJ.writeToConsole("Unrecognized command: " + toString());
+                    break;
+            }
+        });
     }
 
     @Override

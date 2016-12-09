@@ -20,44 +20,111 @@ package com.prizmj.display.simulation;
 import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.simulation.events.Event;
 
-import java.util.Arrays;
 import java.util.PriorityQueue;
 
+import static com.prizmj.display.simulation.EventSimulator.SimulationType.Stepped;
+import static com.prizmj.display.simulation.EventSimulator.SimulationType.SteppedConstant;
+
+/**
+ * This EventSimulation IS NOT THREAD SAFE!!!
+ * PriorityQueue shouldn't be used in a multithreaded environment.
+ * PriorityBlockedQueue implementation sister coming soon. (Probably)
+ */
 public class EventSimulator {
 
-    private PriorityQueue<Event> eventQueue = new PriorityQueue<>();
-
-    public void addEvent(Event event) {
-        if(!eventQueue.contains(event)) eventQueue.add(event);
+    public enum SimulationType {
+        Stepped, SteppedConstant
     }
 
-    public boolean initiateSimulation(int simulationType, float rate, float eventdelay) throws Exception {
-        if(simulationType < 0 || simulationType > 1) throw new Exception("Unknown simulation type.");
-        // sort priority queue first
-        Arrays.sort(eventQueue.toArray());
+    private SimulationType type;
+    private boolean isSimulating = false;
+
+    private PriorityQueue<Event> eventQueue = new PriorityQueue<>((e1, e2) -> Float.compare(e2.getEventPriority(), e1.getEventPriority()));
+
+    /**
+     * Automatically handles adding new events to the event queue based on what simulation type is active.
+     * @param event - The event to be added.
+     */
+    public void addEvent(Event event) {
+        if(!eventQueue.contains(event)) {
+            if(type == null) eventQueue.add(event);
+            else {
+                switch (type) {
+                    case Stepped:
+                        // Since we don't want the stepped simulation to constantly check for newer updates,
+                        // make sure the simulation isn't running before we add a new element.
+                        if(!isSimulating) eventQueue.offer(event);
+                        System.out.println(eventQueue.peek().getModel().getModelName());
+                        break;
+                    case SteppedConstant:
+                        // Opposite of stepped, constant allows for new events to be added during simulation.
+                        eventQueue.offer(event);
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Initiates a stepped simulation. A "stepped" simulation being that one by one, events are executed from the priority queue.
+     * This simulation doesn't allow for adding events whilst running. Useful for demonstrations and debugging.
+     * @param rate - The rate the top level timer will check for the next event to queue. (usually 1 second is fine)
+     * @param eventDelay - The delay on the event defining when it'll be executed.
+     * @return - If the simulation concluded successfully.
+     */
+    public boolean initiateSteppedSimulation(float rate, float eventDelay) throws Exception {
+        if(!isSimulating) isSimulating = true;
+        else return false;
+        type = Stepped;
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 Event topLevelEvent = eventQueue.peek();
-                if(topLevelEvent != null && !topLevelEvent.isQueued()) {
-                    topLevelEvent.setQueued(true);
-                    switch (simulationType) {
-                        case 0:
-                            // Stepped simulation, 1 event at a time //
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    Event event = eventQueue.poll();
-                                    event.execute();
-                                    event.setQueued(false);
-                                    event.reset();
-                                }
-                            }, eventdelay);
-                    }
-                }
+                scheduleEvent(topLevelEvent, eventDelay);
             }
         }, 0, rate);
         return true;
+    }
+
+    /**
+     * Unlike the stepped simulation, everlasting stepped simulation allow for new events to be added to the queue.
+     * In short, you can add events and expect priority to take effect. Useful for actual production.
+     * @param rate - The rate the top level timer will check for the next event to queue. (usually 1 second is fine)
+     * @param eventDelay - The delay on the event defining when it'll be executed.
+     * @return - If the simulation concluded successfully.
+     */
+    public boolean initiateEverlastingSteppedSimulation(float rate, float eventDelay) {
+        if(!isSimulating) isSimulating = true;
+        else return false;
+        type = SteppedConstant;
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                Event topLevelEvent = eventQueue.peek();
+                scheduleEvent(topLevelEvent, eventDelay);
+            }
+        }, 0, rate);
+        return true;
+    }
+
+    /**
+     * Private method the schedules the event if it's not null and not queued already.
+     * @param event - The event to be queued.
+     * @param eventDelay - The delay before the event is executed.
+     */
+    private void scheduleEvent(Event event, float eventDelay) {
+        if(event != null && !event.isQueued()) {
+            event.setQueued(true);
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    Event event = eventQueue.poll();
+                    event.execute();
+                    event.setQueued(false);
+                    event.reset();
+                }
+            }, eventDelay);
+        }
     }
 
 }

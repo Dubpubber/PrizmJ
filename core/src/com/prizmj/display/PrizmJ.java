@@ -29,10 +29,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.prizmj.console.CommandFactory;
 import com.prizmj.display.habitats.EmptyWorld;
 import com.prizmj.display.habitats.Habitat;
-import com.prizmj.display.models.generic.GenericRadiusSphere;
-import com.prizmj.display.models.generic.GenericSensorDropEnv;
 import com.prizmj.display.models.generic.GenericSphere;
 import com.prizmj.display.models.generic.profiles.SphereProfile;
+import com.prizmj.display.simulation.events.ColorChangeEvent;
 import com.prizmj.display.simulation.events.MoveEvent;
 
 import javax.swing.*;
@@ -94,8 +93,14 @@ public class PrizmJ extends ApplicationAdapter {
         commandFeedback = new CommandFactory(this);
 
         try {
-            GenericSensorDropEnv sphere = new GenericSensorDropEnv(this, "sphere");
+            GenericSphere sphere = new GenericSphere(this, "sphere", new SphereProfile(
+                    new Vector3(0, 0, 0), Color.CYAN, 5, 5, 5, 16, 5, 5, 5, 16, 16
+            ));
+            MoveEvent moveEvent = new MoveEvent(sphere, new Vector3(0, 5, 0), 50);
+            ColorChangeEvent changeEvent = new ColorChangeEvent(sphere, 100, Color.GOLD);
             activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, sphere);
+            activeHabitat.getSimulator().initiateEverlastingSteppedSimulation(1, 3);
+            activeHabitat.addEvent(moveEvent, changeEvent);
         } catch (Exception e) {
             e.printStackTrace();
         }

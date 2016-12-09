@@ -8,51 +8,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.prizmj.display.simulation.events;
-/*
- * com.prizmj.display.simulation.events.MoveEvent in PrizmJPortable
- * Created by Tyler Crowe on 12/8/2016.
+package com.prizmj.display.simulation.events;/*
+ * com.prizmj.display.simulation.events.ColorEvent in PrizmJPortable
+ * Created by Tyler Crowe on 12/9/2016.
  * Website: https://loneboat.com
  * GitHub: https://github.com/Dubpubber
- * Machine Time: 4:31 PM
+ * Machine Time: 5:14 AM
  */
 
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.Color;
 import com.prizmj.display.models.IModel;
 
-public class MoveEvent extends Event {
+public class ColorChangeEvent extends Event {
 
-    // The position where the move event will move the attached model.
-    private Vector3 position;
+    private Color color;
 
-    /**
-     * Creates a new move event, which extends event and implements poolable.
-     * Use reset instead of disposing for effective pooling use.
-     * @param model    - The model to be attached to this event.
-     * @param position - The position the model will move to.
-     */
-    public MoveEvent(IModel model, Vector3 position, float priority) {
-        super(model, priority);
-        this.position = position;
-    }
-
-    /**
-     * Updates the position for when execute() is called on.
-     * @param position - The position represented as a vector3
-     */
-    public void init(Vector3 position) {
-        this.position = position;
+    public ColorChangeEvent(IModel model, float eventPriority, Color color) {
+        super(model, eventPriority);
+        this.color = color;
     }
 
     @Override
     public void execute() {
-        getModel().moveTo(position);
+        getModel().changeColor(color);
     }
 
     @Override
     public void reset() {
-        this.position = null;
+        color = null;
     }
-
-
 }

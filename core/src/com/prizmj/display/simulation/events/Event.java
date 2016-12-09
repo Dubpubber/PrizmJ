@@ -64,4 +64,10 @@ public abstract class Event implements Pool.Poolable, Comparable {
 
     @Override
     abstract public void reset();
+
+    @Override
+    public int compareTo(Object o) {
+        return Float.compare(((Event) o).getEventPriority(), getEventPriority());
+    }
+
 }

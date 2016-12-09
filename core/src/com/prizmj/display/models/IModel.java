@@ -18,6 +18,7 @@ package com.prizmj.display.models;
   Machine Time: 4:51 AM
  */
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
@@ -38,6 +39,12 @@ public interface IModel {
      * @return - A vector3 representing the worldly location.
      */
     Vector3 getLocation();
+
+    /**
+     * Changes the color of the attached model.
+     * @param color - The new color.
+     */
+    void changeColor(Color color);
 
     /**
      * Method for moving the model to the specified position.
