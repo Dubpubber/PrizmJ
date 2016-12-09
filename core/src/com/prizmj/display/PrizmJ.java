@@ -25,12 +25,15 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.prizmj.console.CommandFactory;
 import com.prizmj.display.habitats.EmptyWorld;
 import com.prizmj.display.habitats.Habitat;
+import com.prizmj.display.models.generic.GenericRadiusSphere;
 import com.prizmj.display.models.generic.GenericSensorDropEnv;
 import com.prizmj.display.models.generic.GenericSphere;
 import com.prizmj.display.models.generic.profiles.SphereProfile;
+import com.prizmj.display.simulation.events.MoveEvent;
 
 import javax.swing.*;
 
@@ -91,7 +94,8 @@ public class PrizmJ extends ApplicationAdapter {
         commandFeedback = new CommandFactory(this);
 
         try {
-            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, new GenericSensorDropEnv(this, "test_env"));
+            GenericSensorDropEnv sphere = new GenericSensorDropEnv(this, "sphere");
+            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, sphere);
         } catch (Exception e) {
             e.printStackTrace();
         }

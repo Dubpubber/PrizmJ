@@ -22,6 +22,8 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.utils.Array;
 import com.prizmj.display.models.IModel;
+import com.prizmj.display.simulation.EventSimulator;
+import com.prizmj.display.simulation.events.Event;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -40,6 +42,9 @@ public abstract class Habitat {
     private ModelBatch batch;
     private Environment environment;
 
+    /* SIMULATION SPECIFIC OBJECTS */
+    private EventSimulator simulator;
+
     /**
      * Creates a new habitat.
      * @param name - The name of the habitat.
@@ -51,6 +56,7 @@ public abstract class Habitat {
         this.batch = modelBatch;
         this.environment = environment;
         this.models = new Array<>();
+        this.simulator = new EventSimulator();
     }
 
     /**
@@ -66,6 +72,7 @@ public abstract class Habitat {
         this.batch = modelBatch;
         this.environment = environment;
         this.models = new Array<>();
+        this.simulator = new EventSimulator();
         for (IModel im : models) addModel(im);
     }
 
@@ -103,10 +110,26 @@ public abstract class Habitat {
     }
 
     /**
+     * Gets the simulator object, used for creating events.
+     * @return - simulator object.
+     */
+    public EventSimulator getSimulator() {
+        return simulator;
+    }
+
+    /**
      * Disposes of the habitat.
      */
     public void dispose() {
         models.clear();
+    }
+
+    /**
+     * Adds a new event into the simulator.
+     * (helper method)
+     */
+    public void addEvent(Event... events) {
+        for (Event e : events) getSimulator().addEvent(e);
     }
 
 }

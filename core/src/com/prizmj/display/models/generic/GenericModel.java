@@ -17,9 +17,7 @@ package com.prizmj.display.models.generic;/*
  */
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -101,6 +99,7 @@ public abstract class GenericModel implements IModel {
      */
     public void set3DModel(Model model_3d) {
         this.model_3d = model_3d;
+        System.out.println(model_3d);
         set3DModelInstance(new ModelInstance(model_3d));
     }
 
@@ -191,6 +190,7 @@ public abstract class GenericModel implements IModel {
      * Helper method that extends onto original moveTo above.
      * @param position - A vector3 object containing the new coordinates for the generic model.
      */
+    @Override
     public void moveTo(Vector3 position) {
         moveTo(position.x, position.y, position.z);
     }
@@ -208,6 +208,7 @@ public abstract class GenericModel implements IModel {
      * Gets the current location of the generic model in the current habitat.
      * @return - The worldy location.
      */
+    @Override
     public Vector3 getLocation() {
         return worldyLocation;
     }

@@ -20,6 +20,7 @@ package com.prizmj.display.models;
 
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * IModel or obviously "Interface Model" exists so the render manager can access all models, regardless of type, and render them accordingly.
@@ -31,6 +32,18 @@ public interface IModel {
      * @return - The model's name, used for fetching from system manager.
      */
     String getModelName();
+
+    /**
+     * Gets the worldly location of the model.
+     * @return - A vector3 representing the worldly location.
+     */
+    Vector3 getLocation();
+
+    /**
+     * Method for moving the model to the specified position.
+     * @param position - The position represented as a vector3
+     */
+    void moveTo(Vector3 position);
 
     /**
      * Render method that will be called on by the render manager according to libgdx's model batch.
