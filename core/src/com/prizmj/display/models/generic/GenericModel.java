@@ -172,17 +172,18 @@ public abstract class GenericModel implements IModel {
         this.worldyLocation = new Vector3(x, y, z);
 
         if(model_2d != null) {
-            // Update the 2D model instance first.
-            node = model_2d.nodes.first(); // Gets the first node of the 2d model.
-            node.globalTransform.translate(x, y, z);
+            node = modelInstance_2d.nodes.first();
             modelInstance_2d.transform.set(node.globalTransform);
+            node.translation.set(x, y, z);
+            modelInstance_2d.calculateTransforms();
         }
 
         if(model_3d != null) {
             // Now, update the 3D model instance.
-            node = model_3d.nodes.first();
-            node.globalTransform.translate(x, y, z);
+            node = modelInstance_3d.nodes.first();
             modelInstance_3d.transform.set(node.globalTransform);
+            node.translation.set(x, y, z);
+            modelInstance_3d.calculateTransforms();
         }
     }
 
