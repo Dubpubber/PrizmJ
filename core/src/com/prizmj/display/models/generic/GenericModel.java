@@ -200,8 +200,8 @@ public abstract class GenericModel implements IModel {
      * @param color - The new color of the generic model.
      */
     public void changeColor(Color color) {
-        modelInstance_3d.materials.first().set(ColorAttribute.createDiffuse(color));
-        modelInstance_3d.materials.first().set(ColorAttribute.createDiffuse(color));
+       if(modelInstance_2d != null) modelInstance_2d.materials.first().set(ColorAttribute.createDiffuse(color));
+       if(modelInstance_3d != null) modelInstance_3d.materials.first().set(ColorAttribute.createDiffuse(color));
     }
 
     /**
