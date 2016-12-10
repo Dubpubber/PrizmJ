@@ -167,22 +167,14 @@ public abstract class GenericModel implements IModel {
      * @param y - The 'y' coordinate.
      * @param z - The 'z' coordinate.
      */
-    public void moveTo(float x, float y, float z) {
+    public void translateBy(float x, float y, float z) {
         Node node;
         this.worldyLocation = new Vector3(x, y, z);
 
-        if(model_2d != null) {
-            node = modelInstance_2d.nodes.first();
-            modelInstance_2d.transform.set(node.globalTransform);
-            node.translation.set(x, y, z);
-            modelInstance_2d.calculateTransforms();
-        }
-
-        if(model_3d != null) {
-            // Now, update the 3D model instance.
-            node = modelInstance_3d.nodes.first();
+        if(model_3d != null && modelInstance_3d != null) {
+            node = model_3d.nodes.first();
+            node.globalTransform.translate(x, y, z);
             modelInstance_3d.transform.set(node.globalTransform);
-            node.translation.set(x, y, z);
             modelInstance_3d.calculateTransforms();
         }
     }
@@ -193,7 +185,7 @@ public abstract class GenericModel implements IModel {
      */
     @Override
     public void moveTo(Vector3 position) {
-        moveTo(position.x, position.y, position.z);
+        translateBy(position.x, position.y, position.z);
     }
 
     /**

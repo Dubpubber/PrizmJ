@@ -72,6 +72,7 @@ public class EventSimulator {
      * @param eventDelay - The delay on the event defining when it'll be executed.
      * @return - If the simulation concluded successfully.
      */
+    @Deprecated
     public boolean initiateSteppedSimulation(float rate, float eventDelay) throws Exception {
         if(!isSimulating) isSimulating = true;
         else return false;
@@ -121,10 +122,8 @@ public class EventSimulator {
                     Event event = eventQueue.poll();
                     event.execute();
                     event.setQueued(false);
-                    event.reset();
                 }
             }, eventDelay);
         }
     }
-
 }

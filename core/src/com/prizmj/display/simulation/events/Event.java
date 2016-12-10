@@ -20,7 +20,7 @@ package com.prizmj.display.simulation.events;
 import com.badlogic.gdx.utils.Pool;
 import com.prizmj.display.models.IModel;
 
-public abstract class Event implements Pool.Poolable, Comparable {
+public abstract class Event {
 
     // Stores how important the event is to execute, the higher the value, the first it'll be to execute.
     private float eventPriority;
@@ -61,13 +61,5 @@ public abstract class Event implements Pool.Poolable, Comparable {
     }
 
     abstract public void execute();
-
-    @Override
-    abstract public void reset();
-
-    @Override
-    public int compareTo(Object o) {
-        return Float.compare(((Event) o).getEventPriority(), getEventPriority());
-    }
 
 }

@@ -18,12 +18,19 @@ package com.prizmj.display.simulation.events;
  */
 
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 import com.prizmj.display.models.IModel;
 
 public class MoveEvent extends Event {
 
     // The position where the move event will move the attached model.
     private Vector3 position;
+
+    // Boolean for smoothness, meaning, it'll ease to the location.
+    private boolean smoothing = false;
+
+    /* SMOOTHING OBJECTS */
+    private int steps = 5;
 
     /**
      * Creates a new move event, which extends event and implements poolable.
@@ -46,13 +53,23 @@ public class MoveEvent extends Event {
 
     @Override
     public void execute() {
-        getModel().moveTo(position);
+        if(!smoothing) {
+            getModel().moveTo(position);
+        } else {
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    Vector3 currentLocation = getModel().getLocation();
+                    System.out.println();
+                    position = new Vector3(
+                            (currentLocation.x > 0) ? (currentLocation.x + position.x) / steps : (currentLocation.x - position.x) / steps,
+                            (currentLocation.y > 0) ? (currentLocation.y + position.y) / steps : (currentLocation.y - position.y) / steps,
+                            (currentLocation.z > 0) ? (currentLocation.z + position.z) / steps : (currentLocation.z - position.z) / steps
+                    );
+                    getModel().moveTo(position);
+                    if(steps != 0) steps -= 1;
+                }
+            }, 0, 0.5f, steps);
+        }
     }
-
-    @Override
-    public void reset() {
-        this.position = null;
-    }
-
-
 }

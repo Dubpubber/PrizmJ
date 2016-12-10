@@ -69,8 +69,8 @@ public class PrizmJ extends ApplicationAdapter {
         environment = new Environment();
 
         perspectiveCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        perspectiveCamera.position.set(10f, 10f, 10f);
-        perspectiveCamera.lookAt(0, 0, 0);
+        perspectiveCamera.position.set(0, 0, 10f);
+        perspectiveCamera.lookAt(0, 0, 10);
         perspectiveCamera.update();
 
         perspectiveCameraController = new CameraInputController(perspectiveCamera);
@@ -94,13 +94,18 @@ public class PrizmJ extends ApplicationAdapter {
 
         try {
             GenericSphere sphere = new GenericSphere(this, "sphere", new SphereProfile(
-                    new Vector3(0, 0, 0), Color.CYAN, 5, 5, 5, 16, 5, 5, 5, 16, 16
+                    new Vector3(0, 0, 0), Color.CYAN, 5, 5, 5, 16, .75f, .75f, .75f, 16, 16
             ));
-            MoveEvent moveEvent = new MoveEvent(sphere, new Vector3(0, 5, 0), 50);
-            ColorChangeEvent changeEvent = new ColorChangeEvent(sphere, 100, Color.GOLD);
-            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, sphere);
-            activeHabitat.getSimulator().initiateEverlastingSteppedSimulation(1, 3);
-            activeHabitat.addEvent(moveEvent, changeEvent);
+            GenericSphere spheremv = new GenericSphere(this, "sphere-mv", new SphereProfile(
+                    new Vector3(-2, 0, 0), Color.CYAN, 5, 5, 5, 16, .75f, .75f, .75f, 16, 16
+            ));
+            MoveEvent moveEventA = new MoveEvent(sphere, new Vector3(-2, 0, 0), 50);
+            MoveEvent moveEventB = new MoveEvent(sphere, new Vector3(-2, 0, 0), 50);
+            MoveEvent moveEventC = new MoveEvent(spheremv, new Vector3(-2, 0, 0), 50);
+            MoveEvent moveEventD = new MoveEvent(spheremv, new Vector3(-2, 0, 0), 50);
+            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, sphere, spheremv);
+            activeHabitat.getSimulator().initiateEverlastingSteppedSimulation(1, 2.5f);
+            activeHabitat.addEvent(moveEventA, moveEventB, moveEventC, moveEventD);
         } catch (Exception e) {
             e.printStackTrace();
         }
