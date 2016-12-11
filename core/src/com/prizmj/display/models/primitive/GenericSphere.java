@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.prizmj.display.models.generic;
+package com.prizmj.display.models.primitive;
 /*
  * com.prizmj.display.models.generic.GenericSphere in PrizmJPortable
  * Created by Tyler Crowe on 12/8/2016.
@@ -23,7 +23,8 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.prizmj.display.PrizmJ;
-import com.prizmj.display.models.generic.profiles.SphereProfile;
+import com.prizmj.display.models.GenericModel;
+import com.prizmj.display.models.primitive.profiles.SphereProfile;
 
 public class GenericSphere extends GenericModel {
 
@@ -43,7 +44,7 @@ public class GenericSphere extends GenericModel {
         create3DModel();
         // Honor profile //
         changeColor(profile.getColor());
-        moveTo(profile.getPosition());
+        translateBy(profile.getPosition());
     }
 
     @Override
@@ -52,12 +53,10 @@ public class GenericSphere extends GenericModel {
     }
 
     @Override
-    void create2DModel() {
-
-    }
+    public void create2DModel() {}
 
     @Override
-    void create3DModel() {
+    public void create3DModel() {
         getMaterial().set(ColorAttribute.createDiffuse(Color.RED));
         set3DModel(getModelBuilder().createSphere(profile.getSphereWidth(), profile.getSphereHeight(), profile.getSphereDepth(), profile.getSphereDivisionsU(), profile.getSphereDivisionsV(), getMaterial(), VertexAttributes.Usage.Normal | VertexAttributes.Usage.Position));
     }

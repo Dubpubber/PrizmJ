@@ -57,6 +57,7 @@ public class DesktopLauncher extends JFrame {
 
         // Begin add command prompt //
         JTextField commandLine = new JTextField();
+        commandLine.setHighlighter(null);
         commandLine.setBackground(Color.GREEN);
         commandLine.setBounds(800, 718, 560, 20);
         container.add(commandLine);

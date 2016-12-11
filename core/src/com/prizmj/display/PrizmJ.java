@@ -29,9 +29,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.prizmj.console.CommandFactory;
 import com.prizmj.display.habitats.EmptyWorld;
 import com.prizmj.display.habitats.Habitat;
-import com.prizmj.display.models.generic.GenericSphere;
-import com.prizmj.display.models.generic.profiles.SphereProfile;
-import com.prizmj.display.simulation.events.ColorChangeEvent;
+import com.prizmj.display.models.buildings.BasicRoom;
+import com.prizmj.display.models.buildings.profiles.RoomProfile;
+import com.prizmj.display.models.primitive.GenericSphere;
+import com.prizmj.display.models.primitive.profiles.SphereProfile;
 import com.prizmj.display.simulation.events.MoveEvent;
 
 import javax.swing.*;
@@ -93,19 +94,9 @@ public class PrizmJ extends ApplicationAdapter {
         commandFeedback = new CommandFactory(this);
 
         try {
-            GenericSphere sphere = new GenericSphere(this, "sphere", new SphereProfile(
-                    new Vector3(0, 0, 0), Color.CYAN, 5, 5, 5, 16, .75f, .75f, .75f, 16, 16
-            ));
-            GenericSphere spheremv = new GenericSphere(this, "sphere-mv", new SphereProfile(
-                    new Vector3(-2, 0, 0), Color.CYAN, 5, 5, 5, 16, .75f, .75f, .75f, 16, 16
-            ));
-            MoveEvent moveEventA = new MoveEvent(sphere, new Vector3(-2, 0, 0), 50);
-            MoveEvent moveEventB = new MoveEvent(sphere, new Vector3(-2, 0, 0), 50);
-            MoveEvent moveEventC = new MoveEvent(spheremv, new Vector3(-2, 0, 0), 50);
-            MoveEvent moveEventD = new MoveEvent(spheremv, new Vector3(-2, 0, 0), 50);
-            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, sphere, spheremv);
+            BasicRoom basicRoom = new BasicRoom(this, "room_x1", new RoomProfile(0, 0, 0, 10, 10, Color.RED));
+            activeHabitat = new EmptyWorld("emptyworld_1", modelBatch, environment, basicRoom);
             activeHabitat.getSimulator().initiateEverlastingSteppedSimulation(1, 2.5f);
-            activeHabitat.addEvent(moveEventA, moveEventB, moveEventC, moveEventD);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,10 +116,11 @@ public class PrizmJ extends ApplicationAdapter {
             batch.setProjectionMatrix(debugCamera.combined);
             font.draw(batch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), -395, 375);
             {
-                font.draw(batch, "Heap Utilization Statistics", -395, 358);
+                font.draw(batch, "Java/Native Heap Utilization Statistics", -395, 358);
                 font.draw(batch, String.format("Free Memory: %dMB", runtime.freeMemory() / (1024 * 1024)), -390, 341);
                 font.draw(batch, String.format("Total Memory: %dMB", runtime.totalMemory() / (1024 * 1024)), -390, 324);
                 font.draw(batch, String.format("Used Memory: %dMB", (runtime.totalMemory() - runtime.freeMemory()) / (1024*1024)), -390, 307);
+                try {font.draw(batch, String.format("CPU Usage: %d%%", Math.round(Util.getProcessCpuLoad())), -395, 290);} catch (Exception e) {font.draw(batch, "Unable to acquire CPU usage percentage.", -395, 256);}
             }
             batch.end();
             debugCamera.update();

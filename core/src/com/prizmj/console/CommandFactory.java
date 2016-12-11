@@ -17,7 +17,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
+import static com.prizmj.display.PrizmJ.clearCommandText;
 import static com.prizmj.display.PrizmJ.cmdLine;
 
 /**
@@ -27,6 +29,9 @@ public class CommandFactory {
 
     private PrizmJ prizmJ;
 
+    private String lastCommand;
+    private String[] previousArgs;
+
     private String command;
     private String[] args;
 
@@ -35,12 +40,19 @@ public class CommandFactory {
         cmdLine.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && cmdLine.getCaretPosition() == 2)
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && cmdLine.getCaretPosition() == 2)
                     e.consume();
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     // User intends to submit a command!
                     build(cmdLine.getText().substring(2).split(" "));
                     executeCommand();
+                } else if(e.getKeyCode() == KeyEvent.VK_UP && lastCommand != null && previousArgs != null) {
+                    setCommand(lastCommand);
+                    // replace with regex at some point...
+                    cmdLine.setText(String.format("> %s %s", command, Arrays.toString(args).replace("[", "").replace("]", "").replace(",", "")));
+                }else if(!cmdLine.getText().startsWith("> ")) {
+                    PrizmJ.clearCommandText();
+                    cmdLine.setCaretPosition(2);
                 }
             }
         });
@@ -97,6 +109,8 @@ public class CommandFactory {
                     break;
             }
         });
+        lastCommand = command;
+        previousArgs = args;
     }
 
     @Override

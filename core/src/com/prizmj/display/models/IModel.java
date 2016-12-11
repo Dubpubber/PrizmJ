@@ -50,7 +50,7 @@ public interface IModel {
      * Method for moving the model to the specified position.
      * @param position - The position represented as a vector3
      */
-    void moveTo(Vector3 position);
+    void translateBy(Vector3 position);
 
     /**
      * Render method that will be called on by the render manager according to libgdx's model batch.

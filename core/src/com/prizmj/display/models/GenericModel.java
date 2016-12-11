@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.prizmj.display.models.generic;/*
+package com.prizmj.display.models;/*
  * com.prizmj.display.models.generic.GenericModel in PrizmJPortable
  * Created by Tyler Crowe on 12/8/2016.
  * Website: https://loneboat.com
@@ -17,14 +17,15 @@ package com.prizmj.display.models.generic;/*
  */
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.prizmj.display.Dimension;
 import com.prizmj.display.PrizmJ;
-import com.prizmj.display.models.IModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -184,7 +185,7 @@ public abstract class GenericModel implements IModel {
      * @param position - A vector3 object containing the new coordinates for the generic model.
      */
     @Override
-    public void moveTo(Vector3 position) {
+    public void translateBy(Vector3 position) {
         translateBy(position.x, position.y, position.z);
     }
 
@@ -236,6 +237,6 @@ public abstract class GenericModel implements IModel {
     }
 
     /* BEGIN ABSTRACT METHODS (Every generic model must implement this) */
-    abstract void create2DModel(); // Each are pretty self-explanatory.
-    abstract void create3DModel(); // But very important!
+    public abstract void create2DModel(); // Each are pretty self-explanatory.
+    public abstract void create3DModel(); // But very important!
 }

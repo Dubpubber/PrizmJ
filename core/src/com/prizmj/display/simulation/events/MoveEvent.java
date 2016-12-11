@@ -54,7 +54,7 @@ public class MoveEvent extends Event {
     @Override
     public void execute() {
         if(!smoothing) {
-            getModel().moveTo(position);
+            getModel().translateBy(position);
         } else {
             Timer.schedule(new Timer.Task() {
                 @Override
@@ -66,7 +66,7 @@ public class MoveEvent extends Event {
                             (currentLocation.y > 0) ? (currentLocation.y + position.y) / steps : (currentLocation.y - position.y) / steps,
                             (currentLocation.z > 0) ? (currentLocation.z + position.z) / steps : (currentLocation.z - position.z) / steps
                     );
-                    getModel().moveTo(position);
+                    getModel().translateBy(position);
                     if(steps != 0) steps -= 1;
                 }
             }, 0, 0.5f, steps);
